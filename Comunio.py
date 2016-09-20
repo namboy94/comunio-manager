@@ -23,9 +23,6 @@ LICENSE
 """
 
 # imports
-import sys
-import sqlite3
-import datetime
 import requests
 from bs4 import BeautifulSoup
 
@@ -93,6 +90,7 @@ class Comunio:
             for player in players:
 
                 attrs = player.select("td")
+                print(player)
                 player_info = {"name": attrs[0].text.strip(),
                                "value": attrs[2].text.strip().replace(".", ""),
                                "points": attrs[3].text.strip(),
@@ -100,18 +98,3 @@ class Comunio:
                 player_list.append(player_info)
 
         return player_list
-
-
-if __name__ == "__main__":
-
-    comunio = Comunio(sys.argv[1], sys.argv[2])
-
-    team_value = comunio.teamvalue
-    cash = comunio.money
-    players = comunio.get_own_player_list()
-
-    date = datetime.datetime.utcnow()
-
-    sqlite3
-
-
