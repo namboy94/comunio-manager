@@ -22,6 +22,7 @@ This file is part of comunio-manager.
 LICENSE
 """
 
+import os
 import sys
 import datetime
 import sqlite3
@@ -50,5 +51,6 @@ def update_db(username, password):
 
 if __name__ == '__main__':
 
-
-    update_db(sys.argv[0], sys.argv[1])
+    print(os.getcwd())
+    print("HHHHHHHH")
+    update_db(sys.argv[1], sys.argv[2])

@@ -90,7 +90,6 @@ class Comunio:
             for player in players:
 
                 attrs = player.select("td")
-                print(player)
                 player_info = {"name": attrs[0].text.strip(),
                                "value": attrs[2].text.strip().replace(".", ""),
                                "points": attrs[3].text.strip(),
