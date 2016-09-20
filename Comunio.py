@@ -1,93 +1,117 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*- 
+"""
+LICENSE:
+Copyright 2014 Javier Corbín, 2016 Hermann Krumrey
 
-# Copyright 2014 Javier Corbín, 2016 Hermann Krumrey
+This file is part of comunio-manager.
 
-from bs4 import BeautifulSoup
-from datetime import date as dt
-import os
-import re
-import requests
+    comunio-manager is a program that allows a user to track his/her comunio.de
+    profile
+
+    comunio-manager is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    comunio-manager is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with comunio-manager.  If not, see <http://www.gnu.org/licenses/>.
+LICENSE
+"""
+
+# imports
 import sys
-import time
+import sqlite3
+import datetime
+import requests
+from bs4 import BeautifulSoup
+
 
 class Comunio:
+    """
+    The Comunio Web scraping class
+    """
 
-    def __init__(self,username,password):
+    def __init__(self, username: str, password: str) -> None:
+        """
+        Constructor that creates the logged in session
+
+        :param username: the user's user name for comunio.de
+        :param password: the user's password
+        """
         self.username = username
         self.password = password
+
+        self.money = 0
+        self.teamvalue = 0
+
         self.session = requests.session()
         self.login()
 
     def login(self):
-        payload = { 'login':self.username,
-                    'pass':self.password,
-                    'action':'login'}
-        
-        req = self.session.post('http://www.comunio.de/login.phtml',data=payload).text
-        if 'puntos en proceso' in req or 'points in process' in req:
-            print('Comunio webpage not available.')
-            return
+        """
+        Logs in the user
 
-        self.load_info() #Function to load the account information
+        :return: None
+        """
+        payload = {'login': self.username,
+                   'pass': self.password,
+                   'action': 'login'}
+        
+        self.session.post('http://www.comunio.de/login.phtml', data=payload)
+        self.load_info()
   
     def load_info(self):
-        ''' Get info from logged account '''
-        headers = {"Content-type": "application/x-www-form-urlencoded","Accept": "text/plain",'Referer': 'http://www.comunio.de/login.phtml',"User-Agent": user_agent}
-        req = self.session.get('http://www.comunio.de/team_news.phtml',headers=headers).content
-        soup = BeautifulSoup(req, 'html.parser')
-        self.title = soup.title.string
-        
-        estado = soup.find('div',{'id':'content'}).find('div',{'id':'manager'}).string
-        if estado:
-            print(estado.strip())
-            return
+        """
+        Loads the user's important information
 
-        [s.extract() for s in soup('strong')]
-        if (soup.find('div',{'id':'userid'}) != None):
-            self.myid = soup.find('div',{'id':'userid'}).p.text.strip()[2:]
-            self.money = int(soup.find('div',{'id':'manager_money'}).p.text.strip().replace(".","")[:-2])
-            self.teamvalue = int(soup.find('div',{'id':'teamvalue'}).p.text.strip().replace(".","")[:-2])
-            self.community_id = soup.find('link')['href'][24:]
-            self.username = soup.find('div',{'id':'username'}).p.a.text
+        :return: None
+        """
+        html = self.session.get('http://www.comunio.de/team_news.phtml').content
+        soup = BeautifulSoup(html, 'html.parser')
 
-    def get_money(self):
-        '''Get my money'''
-        return self.money
-    
-    def get_team_value(self):
-        '''Get my team value'''
-        return self.teamvalue    
+        if soup.find('div', {'id': 'userid'}) is not None:
+            self.money = int(soup.find('div', {'id': 'manager_money'}).p.text.strip().replace(".", "")[12:-2])
+            self.teamvalue = int(soup.find('div', {'id': 'teamvalue'}).p.text.strip().replace(".", "")[17:-2])
 
     def get_own_player_list(self):
-        players = []
+        """
+        :return: A list of the user's players as a dictionary
+        """
+        player_list = []
 
         sell_html = self.session.get("http://www.comunio.de/putOnExchangemarket.phtml")
         on_sale_html = self.session.get('http://www.comunio.de/exchangemarket.phtml?takeplayeroff_x=22')
-
         soups = (BeautifulSoup(sell_html.text, "html.parser"), BeautifulSoup(on_sale_html.text, "html.parser"))
 
         for soup in soups:
-            pls = soup.select(".tr1") + soup.select(".tr2")
+            players = soup.select(".tr1") + soup.select(".tr2")
 
-            for p in pls:
-                attrs = p.select("td")
+            for player in players:
 
-                player = {"name": attrs[0].text.strip(),
-                          "value": attrs[2].text.strip().replace(".", ""),
-                          "points": attrs[3].text.strip(),
-                          "position": attrs[4].text.strip()}
+                attrs = player.select("td")
+                player_info = {"name": attrs[0].text.strip(),
+                               "value": attrs[2].text.strip().replace(".", ""),
+                               "points": attrs[3].text.strip(),
+                               "position": attrs[4].text.strip()}
+                player_list.append(player_info)
 
-                players.append(player)
+        return player_list
 
-        return players
-    
+
 if __name__ == "__main__":
-    c = Comunio()
 
-    team_value = c.get_team_value()
-    cash = c.get_money()
+    comunio = Comunio(sys.argv[1], sys.argv[2])
 
-    players = c.get_own_player_list()
-    for player in players:
-        print(player)
+    team_value = comunio.teamvalue
+    cash = comunio.money
+    players = comunio.get_own_player_list()
+
+    date = datetime.datetime.utcnow()
+
+    sqlite3
+
+
