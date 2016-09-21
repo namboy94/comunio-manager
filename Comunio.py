@@ -84,16 +84,24 @@ class Comunio:
         on_sale_html = self.session.get('http://www.comunio.de/exchangemarket.phtml?takeplayeroff_x=22')
         soups = (BeautifulSoup(sell_html.text, "html.parser"), BeautifulSoup(on_sale_html.text, "html.parser"))
 
-        for soup in soups:
+        for i, soup in enumerate(soups):
             players = soup.select(".tr1") + soup.select(".tr2")
 
             for player in players:
 
                 attrs = player.select("td")
-                player_info = {"name": attrs[0].text.strip(),
-                               "value": attrs[2].text.strip().replace(".", ""),
-                               "points": attrs[3].text.strip(),
-                               "position": attrs[4].text.strip()}
+                if i == 0:
+                    player_info = {"name": attrs[0].text.strip(),
+                                   "value": attrs[2].text.strip().replace(".", ""),
+                                   "points": attrs[3].text.strip(),
+                                   "position": attrs[4].text.strip()}
+                elif i == 1:
+                    player_info = {"name": attrs[1].text.strip(),
+                                   "value": attrs[4].text.strip().replace(".", ""),
+                                   "points": attrs[5].text.strip(),
+                                   "position": attrs[7].text.strip()}
+                else:
+                    player_info = {}
                 player_list.append(player_info)
 
         return player_list
