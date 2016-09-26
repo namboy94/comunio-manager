@@ -1,6 +1,6 @@
 """
 LICENSE:
-Copyright 2014 Javier Corbín, 2016 Hermann Krumrey
+Copyright 2014 Javier Corbín (MIT License), 2016 Hermann Krumrey
 
 This file is part of comunio-manager.
 
@@ -23,6 +23,7 @@ LICENSE
 """
 
 # imports
+import re
 import requests
 from bs4 import BeautifulSoup
 
@@ -44,6 +45,8 @@ class Comunio:
 
         self.money = 0
         self.teamvalue = 0
+        self.comunio_id = ""
+        self.screen_name = ""
 
         self.session = requests.session()
         self.login()
@@ -73,6 +76,11 @@ class Comunio:
         if soup.find('div', {'id': 'userid'}) is not None:
             self.money = int(soup.find('div', {'id': 'manager_money'}).p.text.strip().replace(".", "")[12:-2])
             self.teamvalue = int(soup.find('div', {'id': 'teamvalue'}).p.text.strip().replace(".", "")[17:-2])
+            self.comunio_id = soup.find('div', {'id': 'userid'}).p.text.strip()[6:]
+
+            screen_name_html = self.session.get('http://www.comunio.de/playerInfo.phtml?pid=' + self.comunio_id).text
+            screen_name_soup = BeautifulSoup(screen_name_html, "html.parser")
+            self.screen_name = screen_name_soup.find('div', {'id': "title"}).h1.text.split("\xa0")[0]
 
     def get_own_player_list(self):
         """
@@ -81,7 +89,7 @@ class Comunio:
         player_list = []
 
         sell_html = self.session.get("http://www.comunio.de/putOnExchangemarket.phtml")
-        on_sale_html = self.session.get('http://www.comunio.de/exchangemarket.phtml?takeplayeroff_x=22')
+        on_sale_html = self.session.get("http://www.comunio.de/exchangemarket.phtml?takeplayeroff_x=22")
         soups = (BeautifulSoup(sell_html.text, "html.parser"), BeautifulSoup(on_sale_html.text, "html.parser"))
 
         for i, soup in enumerate(soups):
@@ -105,3 +113,22 @@ class Comunio:
                 player_list.append(player_info)
 
         return player_list
+
+    def get_transfers(self):
+
+        transfers = []
+
+        html = self.session.get("http://www.comunio.de/team_news.phtml").text
+        soup = BeautifulSoup(html, "html.parser")
+        for i in soup.find_all('div', {'class', 'article_content_text'}):
+
+            if "wechselt für" in i.text:
+                arguments = i.text.split(" ")
+                transfer = []
+
+        return transfers
+
+if __name__ == '__main__':
+    import sys
+    c = Comunio(sys.argv[1], sys.argv[2])
+    print(c.get_transfers())
