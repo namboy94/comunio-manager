@@ -22,29 +22,79 @@ This file is part of comunio-manager.
 LICENSE
 """
 
+# imports
+import os
 import datetime
 import sqlite3
 import sys
 from typing import Dict
+from comunio.scraper.ComunioSession import ComunioSession
 
-from comunio.Comunio import Comunio
 
+class DatabaseManager(object):
+    """
+    Class that manages the local comunio database
+    """
 
-class ComunioDb(object):
+    def __init__(self, comunio_session: ComunioSession) -> None:
+        """
+        Initializes the DatabaseManager object using a previously established comunio session
 
-    def __init__(self, username: str, password: str) -> None:
-        self.comunio = Comunio(username, password)
-        self.database = sqlite3.connect("database_test")
-        self.update_db()
+        :param comunio_session: A previously established comunio session
+        """
+        comunio_dir = os.path.join(os.path.expanduser("~"), ".comunio")
+        database_path = os.path.join(comunio_dir, "history.db")
+
+        if not os.path.isdir(comunio_dir):
+            os.makedirs(comunio_dir)
+
+        self.comunio_session = comunio_session
+        self.database = sqlite3.connect(database_path)
+        self.apply_schema()
+        self.update_database()
+
+    def apply_schema(self) -> None:
+        """
+        Ensures that the correct schema is present in the connected database file
+
+        :return: None
+        """
+        player_table = "CREATE TABLE IF NOT EXISTS players (" \
+                       "name TEXT NOT NULL," \
+                       "position TEXT NOT NULL," \
+                       "value INTEGER NOT NULL," \
+                       "points INTEGER NOT NULL," \
+                       "date TEXT NOT NULL" \
+                       ");"
+
+        player_info_table = "CREATE TABLE IF NOT EXISTS player_info (" \
+                            "name TEXT NOT NULL," \
+                            "buy_value INTEGER NOT NULL," \
+                            "sell_value INTEGER" \
+                            ");"
+
+        manager_stats = "CREATE TABLE IF NOT EXISTS manager_stats (" \
+                        "date TEXT NOT NULL," \
+                        "cash INTEGER NOT NULL," \
+                        "team_value INTEGER NOT NULL" \
+                        ");"
+
+        self.database.execute(player_table + player_info_table + manager_stats)
+        self.database.commit()
 
     def update_db(self) -> None:
+        """
+        Updates the local database with current information from comunio
+
+        :return: None
+        """
 
         date = datetime.datetime.utcnow()
         date = str(date.year).zfill(4) + "-" + str(date.month).zfill(2) + "-" + str(date.day).zfill(2)
 
         today_results = self.database.execute("SELECT * FROM players WHERE date = ?", (date,)).fetchall()
 
-        if len(today_results) == 0:
+        if len(today_results) == 0:  # Check if today's data has already been entered
 
             players = self.comunio.get_own_player_list()
             cash = self.comunio.money

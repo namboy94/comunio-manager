@@ -27,9 +27,9 @@ import requests
 from bs4 import BeautifulSoup
 
 
-class Comunio:
+class ComunioSession:
     """
-    The Comunio Web scraping class
+    The Comunio Web scraping class, which stores the authenticated comunio session
     """
 
     def __init__(self, username: str, password: str) -> None:
@@ -39,51 +39,60 @@ class Comunio:
         :param username: the user's user name for comunio.de
         :param password: the user's password
         """
-        self.username = username
-        self.password = password
+        # We don't store the username and password to avoid having this stored in memory,
+        # instead, we use a session to stay logged in
 
         self.money = 0
         self.teamvalue = 0
         self.comunio_id = ""
+        self.player_name = ""
         self.screen_name = ""
 
         self.session = requests.session()
-        self.login()
+        self.login(username, password)
 
-    def login(self):
+    def login(self, username: str, password: str) -> None:
         """
-        Logs in the user
+        Logs in the user and creates a logged in session object for further queries
 
-        :return: None
+        :param username: the user's user name for comunio.de
+        :param password: the user's password
+        :return:         None
         """
-        payload = {'login': self.username,
-                   'pass': self.password,
-                   'action': 'login'}
+        payload = {"login": username,
+                   "pass": password,
+                   "action": 'login'}
         
-        self.session.post('http://www.comunio.de/login.phtml', data=payload)
+        self.session.post("http://www.comunio.de/login.phtml", data=payload)
         self.load_info()
   
     def load_info(self):
         """
-        Loads the user's important information
+        Loads the user's most important profile information
 
-        :return: None
+        :raises ConnectionError: if the log in process failed
+        :return:                 None
         """
-        html = self.session.get('http://www.comunio.de/team_news.phtml').content
-        soup = BeautifulSoup(html, 'html.parser')
+        html = self.session.get("http://www.comunio.de/team_news.phtml").text
+        soup = BeautifulSoup(html, "html.parser")
 
-        if soup.find('div', {'id': 'userid'}) is not None:
-            self.money = int(soup.find('div', {'id': 'manager_money'}).p.text.strip().replace(".", "")[12:-2])
-            self.teamvalue = int(soup.find('div', {'id': 'teamvalue'}).p.text.strip().replace(".", "")[17:-2])
-            self.comunio_id = soup.find('div', {'id': 'userid'}).p.text.strip()[6:]
+        if soup.find("div", {"id": "userid"}) is not None:
 
-            screen_name_html = self.session.get('http://www.comunio.de/playerInfo.phtml?pid=' + self.comunio_id).text
+            self.money = int(soup.find("div", {"id": "manager_money"}).p.text.strip().replace(".", "")[12:-2])
+            self.teamvalue = int(soup.find("div", {"id": "teamvalue"}).p.text.strip().replace(".", "")[17:-2])
+            self.comunio_id = soup.find("div", {"id": "userid"}).p.text.strip()[6:]
+
+            screen_name_html = self.session.get("http://www.comunio.de/playerInfo.phtml?pid=" + self.comunio_id).text
             screen_name_soup = BeautifulSoup(screen_name_html, "html.parser")
-            self.screen_name = screen_name_soup.find('div', {'id': "title"}).h1.text.split("\xa0")[0]
+            self.player_name = screen_name_soup.find("div", {"id": "title"}).h1.text
+            self.screen_name = self.player_name.split("\xa0")[0]
+
+        else:
+            raise ConnectionError("Log In failed, incorrect credentials?")
 
     def get_own_player_list(self):
         """
-        :return: A list of the user's players as a dictionary
+        :return: A list of the user's players as dictionaries
         """
         player_list = []
 
@@ -128,8 +137,3 @@ class Comunio:
                 }
 
         return transfers
-
-if __name__ == '__main__':
-    import sys
-    c = Comunio(sys.argv[1], sys.argv[2])
-    print(c.get_transfers())

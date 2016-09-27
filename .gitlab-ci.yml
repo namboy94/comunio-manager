@@ -12,10 +12,10 @@ clone_master:
   script:
     - git checkout master
     - git pull origin master
-    - git push -u git@github.com:namboy94/comunio.git master --force
+    - git push -u git@github.com:namboy94/comunio-manager.git master --force
     - git checkout develop
     - git pull origin develop
-    - git push -u git@github.com:namboy94/comunio.git develop --force
+    - git push -u git@github.com:namboy94/comunio-manager.git develop --force
 
 run_unit_tests:
   stage: test
@@ -23,7 +23,7 @@ run_unit_tests:
     - master
     - develop
   script:
-    - echo Disabled #python3 setup.py test
+    - python3 setup.py test
 
 source_dist:
   stage: deploy
