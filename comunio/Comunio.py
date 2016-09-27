@@ -23,7 +23,6 @@ LICENSE
 """
 
 # imports
-import re
 import requests
 from bs4 import BeautifulSoup
 
@@ -124,7 +123,9 @@ class Comunio:
 
             if "wechselt für" in i.text:
                 arguments = i.text.split(" ")
-                transfer = []
+                transfer = {
+                    "player": arguments
+                }
 
         return transfers
 

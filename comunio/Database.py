@@ -22,11 +22,12 @@ This file is part of comunio-manager.
 LICENSE
 """
 
-import sys
 import datetime
 import sqlite3
+import sys
 from typing import Dict
-from Comunio import Comunio
+
+from comunio.Comunio import Comunio
 
 
 class ComunioDb(object):
