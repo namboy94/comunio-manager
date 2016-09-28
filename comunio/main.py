@@ -28,3 +28,5 @@ from comunio.database.DatabaseManager import DatabaseManager
 
 comunio = ComunioSession("namboy1994", "Eragon11")
 db = DatabaseManager(comunio)
+
+print(comunio.get_today_transfers())

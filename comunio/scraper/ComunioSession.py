@@ -24,8 +24,9 @@ LICENSE
 
 # imports
 import requests
-from typing import Dict
+import datetime
 from bs4 import BeautifulSoup
+from typing import Dict, List
 
 
 class ComunioSession:
@@ -101,6 +102,38 @@ class ComunioSession:
         else:
             raise ConnectionError("Log In failed, incorrect credentials?")
 
+    def __fetch_recent_news_articles(self) -> List[Dict[str, str]]:
+        """
+        Fetches the most recent news articles for the logged in player
+
+        :return: List of article dictionaries with the following attributes:
+                    - date:    The article's date
+                    - type:    The type of the article, e.g. 'transfers'
+                    - content: The article's content
+        """
+        html = self.__session.get("http://www.comunio.de/team_news.phtml").text
+        soup = BeautifulSoup(html, "html.parser")
+
+        article_headers = soup.select(".article_header1") + soup.select(".article_header2")
+        article_content = soup.select(".article_content1") + soup.select(".article_content2")
+
+        articles = []
+
+        for index in range(0, len(article_headers)):
+
+            header = article_headers[index].text.strip()
+            content = article_content[index].text.strip()
+
+            article = {
+                "date": header.split(" ", 1)[0],
+                "type": header.split(" > ", 1)[1],
+                "content": content
+            }
+
+            articles.append(article)
+
+        return articles
+
     def get_cash(self) -> int:
         """
         :return: The player's current amount of liquid assets
@@ -113,7 +146,7 @@ class ComunioSession:
         """
         return self.__team_value
 
-    def get_own_player_list(self) -> Dict[str, str or int]:
+    def get_own_player_list(self) -> List[Dict[str, str or int]]:
         """
         Creates dictionaries modelling the user's current players and returns them
         in a list.
@@ -154,3 +187,36 @@ class ComunioSession:
                 player_list.append(player_info)
 
         return player_list
+
+    def get_today_transfers(self) -> List[Dict[str, str or int]]:
+        """
+        Fetches the transfer activity for today from comunio's news section. Only fetches
+        transfers related to the logged in player
+
+        :return: A list of transfer dictionaries, consisting of the following attributes:
+                    - name:   the name of the player
+                    - amount: the transfer amount
+                    - type:   "bought" or "sold" to differentiate between the two transfer types
+        """
+        date = datetime.datetime.utcnow()
+        date = str(date.day).zfill(2) + "." + str(date.month).zfill(2) + "." + str(date.year)[2:4]
+
+        transfers = []
+        for article in self.__fetch_recent_news_articles():
+            if article["type"] == "Transfers" and article["date"] == date:
+
+                transfer_text = article["content"]
+
+                while True:
+                    player_name, transfer_text = transfer_text.split(" wechselt für ", 1)
+                    amount, transfer_text = transfer_text.split(" von ", 1)
+                    seller_name, transfer_text = transfer_text.split(" zu ", 1)
+                    buyer_name = transfer_text.split(".", 1)
+
+                    transfer = {"name": player_name,
+                                "amount": int(amount.replace(".", ""))}
+
+                    if seller_name == self.__screen_name or buyer_name == self.__screen_name:
+                        transfer["type"] = "bought" if buyer_name == self.__screen_name else "sold"
+                        transfers.append(transfer)
+        return transfers

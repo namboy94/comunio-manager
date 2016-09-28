@@ -96,7 +96,6 @@ class DatabaseManager(object):
 
         sql = "INSERT INTO players (name, value, points, position, date) VALUES(?, ?, ?, ?, ?)"
         for player in players:
-            # noinspection PyTypeChecker
             self.__database.execute(sql, (player["name"],
                                           player["value"],
                                           player["points"],
@@ -164,3 +163,18 @@ class DatabaseManager(object):
             players.append(player)
 
         return players
+
+    def get_player_buy_values(self) -> Dict[str, int]:
+        """
+        Fetches all player's buy values, i.e. the price for which they were bought
+        Players that were already sold are ignored
+
+        :return: the player buy values as a dictionary with the player names as key and the values as content
+        """
+        buy_values = {}
+        players = self.__database.execute("SELECT * FROM player_info WHERE sell_value IS NULL").fetchall()
+
+        for player in players:
+            buy_values[player[0]] = player[1]
+        return buy_values
+
