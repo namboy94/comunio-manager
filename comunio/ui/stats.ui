@@ -15,7 +15,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="5">
+    <item row="1" column="7">
      <widget class="QLabel" name="total_assets_display">
       <property name="text">
        <string>0€</string>
@@ -49,7 +49,7 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="4">
+    <item row="0" column="5">
      <widget class="QLabel" name="label_2">
       <property name="text">
        <string>Team Value</string>
@@ -69,7 +69,7 @@
       </property>
      </spacer>
     </item>
-    <item row="1" column="4">
+    <item row="1" column="5">
      <widget class="QLabel" name="team_value_display">
       <property name="text">
        <string>0€</string>
@@ -83,12 +83,28 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="5">
+    <item row="0" column="7">
      <widget class="QLabel" name="label">
       <property name="text">
        <string>Total Assets</string>
       </property>
      </widget>
+    </item>
+    <item row="0" column="6">
+     <spacer name="horizontalSpacer_4">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Fixed</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
     </item>
     <item row="4" column="0">
      <widget class="QLabel" name="label_7">
@@ -146,21 +162,24 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="6">
-     <widget class="QLabel" name="label_4">
-      <property name="text">
-       <string>Balance</string>
-      </property>
-     </widget>
+    <item row="3" column="2" rowspan="4" colspan="8">
+     <widget class="QGraphicsView" name="player_graph"/>
     </item>
-    <item row="1" column="6">
+    <item row="1" column="9">
      <widget class="QLabel" name="balance_display">
       <property name="text">
        <string>0€</string>
       </property>
      </widget>
     </item>
-    <item row="2" column="0" colspan="7">
+    <item row="0" column="9">
+     <widget class="QLabel" name="label_4">
+      <property name="text">
+       <string>Balance</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0" colspan="10">
      <widget class="QTreeWidget" name="player_table">
       <property name="minimumSize">
        <size>
@@ -210,8 +229,37 @@
       </column>
      </widget>
     </item>
-    <item row="3" column="2" rowspan="4" colspan="5">
-     <widget class="QGraphicsView" name="player_graph"/>
+    <item row="0" column="4">
+     <spacer name="horizontalSpacer_3">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Fixed</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="0" column="8">
+     <spacer name="horizontalSpacer_5">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Fixed</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
     </item>
    </layout>
   </widget>

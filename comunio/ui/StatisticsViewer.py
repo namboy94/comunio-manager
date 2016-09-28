@@ -49,6 +49,8 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
         super().__init__(parent)
         self.setupUi(self)
 
+        self.__players = []
+
         self.__comunio_session = comunio_session
         self.__database_manager = database_manager
         self.__statistics_calculator = StatisticsCalculator(comunio_session, database_manager)
@@ -69,7 +71,12 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
         self.cash_display.setText("{:,}€".format(cash))
         self.team_value_display.setText("{:,}€".format(team_value))
 
+        self.total_assets_display.setText("{:,}".format(cash + team_value))
+        self.balance_display.setText("{:,}".format(self.__statistics_calculator.calculate_total_assets_delta()))
+
         self.__fill_player_table()
+
+        self.player_table.itemSelectionChanged.connect(self.__select_player)
 
     def __fill_player_table(self) -> None:
         """
@@ -87,6 +94,8 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
                     players.append(player)
 
         for player in players:
+
+            self.__players.append(player)
 
             position = player["position"]
             name = player["name"]
@@ -117,6 +126,22 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
                                                                total_player_delta,
                                                                tendency]))
 
+    def __select_player(self) -> None:
+        """
+        Called whenever the user selects a player from the table. Fills the side info and generates
+        the value history graph
+
+        :return: None
+        """
+        player = self.__players[self.player_table.selectedIndexes()[0].row()]
+
+        self.player_name_label.setText(player["name"])
+        self.player_position_label.setText(player["position"])
+        self.player_points_label.setText(str(player["points"]))
+        self.player_value_label.setText("{:,}".format(player["value"]))
+
+        historic_data = self.__database_manager.get_historic_values_for_player(player["name"])
+        # TODO Fill the graph
 
 def start(comunio_session: ComunioSession or None, database_manager: DatabaseManager) -> None:
     """

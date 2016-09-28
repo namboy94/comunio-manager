@@ -329,3 +329,27 @@ class DatabaseManager(object):
         :return: The last recorded team value
         """
         return self.__database.execute("SELECT team_value, MAX(date) FROM manager_stats").fetchall()[0][0]
+
+    def get_historic_values_for_player(self, player: str) -> List[int]:
+        """
+        Retrieves the value of a player over time as a list of reversely-chronologically sorted values
+
+        :param player: The player for which the history should be retrieved
+        :return:       The list of values
+        """
+        values = []
+
+        day = 0
+        while True:
+            player_on_day = self.get_player_on_day(player, day)
+            if player_on_day is not None:
+                values.append(player_on_day["value"])
+            else:
+                date = self.__create_sqlite_date(day)
+                lowest_date = self.__database.execute("SELECT MIN(date) FROM players").fetchall()[0][0]
+                if date < lowest_date:
+                    break
+
+            day -= 1
+
+        return values

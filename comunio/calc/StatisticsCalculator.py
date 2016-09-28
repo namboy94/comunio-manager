@@ -58,10 +58,3 @@ class StatisticsCalculator(object):
             return self.__database_manager.get_last_cash_amount()\
                    + self.__database_manager.get_last_team_value_amount()\
                    - 40000000
-
-    def calculate_total_player_deltas(self) -> Dict[str, int]:
-        """
-        Calculates the difference between a player's initial buy value and their current value
-        :return: The player value deltas as a dictionary
-        """
-        pass
