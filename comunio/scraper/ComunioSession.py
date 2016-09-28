@@ -24,6 +24,7 @@ LICENSE
 
 # imports
 import requests
+from typing import Dict
 from bs4 import BeautifulSoup
 
 
@@ -36,8 +37,10 @@ class ComunioSession:
         """
         Constructor that creates the logged in session
 
-        :param username: the user's user name for comunio.de
-        :param password: the user's password
+        :param username:         the user's user name for comunio.de
+        :param password:         the user's password
+        :raises ConnectionError: When the log in process failed. Exception message contains the
+                                 details of the cause of the exception
         """
         # We don't store the username and password to avoid having this stored in memory,
         # instead, we use a session to stay logged in
@@ -49,7 +52,13 @@ class ComunioSession:
         self.__screen_name = ""
 
         self.__session = requests.session()
-        self.__login(username, password)
+
+        # Can raise Exception on wrong credentials, unexpected network state
+        # and whenever comunio.de blocks the site for any non-pro users
+        try:
+            self.__login(username, password)
+        except requests.exceptions.ConnectionError:
+            raise ConnectionError("Network Error")
 
     def __login(self, username: str, password: str) -> None:
         """
@@ -66,7 +75,7 @@ class ComunioSession:
         self.__session.post("http://www.comunio.de/login.phtml", data=payload)
         self.__load_info()
   
-    def __load_info(self):
+    def __load_info(self) -> None:
         """
         Loads the user's most important profile information
 
@@ -104,9 +113,9 @@ class ComunioSession:
         """
         return self.__team_value
 
-    def get_own_player_list(self):
+    def get_own_player_list(self) -> Dict[str, str or int]:
         """
-        Creates dictionaries modelling the user's cureent players and returns them
+        Creates dictionaries modelling the user's current players and returns them
         in a list.
 
         The format of these dictionaries is:
@@ -132,34 +141,16 @@ class ComunioSession:
                 attrs = player.select("td")
                 if i == 0:
                     player_info = {"name": attrs[0].text.strip(),
-                                   "value": attrs[2].text.strip().replace(".", ""),
-                                   "points": attrs[3].text.strip(),
+                                   "value": int(attrs[2].text.strip().replace(".", "")),
+                                   "points": int(attrs[3].text.strip()),
                                    "position": attrs[4].text.strip()}
                 elif i == 1:
                     player_info = {"name": attrs[1].text.strip(),
-                                   "value": attrs[4].text.strip().replace(".", ""),
-                                   "points": attrs[5].text.strip(),
+                                   "value": int(attrs[4].text.strip().replace(".", "")),
+                                   "points": int(attrs[5].text.strip()),
                                    "position": attrs[7].text.strip()}
                 else:
                     player_info = {}
                 player_list.append(player_info)
 
         return player_list
-
-    """
-    def get_transfers(self):
-
-        transfers = []
-
-        html = self.session.get("http://www.comunio.de/team_news.phtml").text
-        soup = BeautifulSoup(html, "html.parser")
-        for i in soup.find_all('div', {'class', 'article_content_text'}):
-
-            if "wechselt für" in i.text:
-                arguments = i.text.split(" ")
-                transfer = {
-                    "player": arguments
-                }
-
-        return transfers
-    """

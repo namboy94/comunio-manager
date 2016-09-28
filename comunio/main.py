@@ -23,6 +23,8 @@ LICENSE
 """
 
 from comunio.scraper.ComunioSession import ComunioSession
+from comunio.database.DatabaseManager import DatabaseManager
 
 
-print(ComunioSession("namboy1994", "Eragon11").screen_name)
+comunio = ComunioSession("namboy1994", "Eragon11")
+db = DatabaseManager(comunio)
