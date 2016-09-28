@@ -26,7 +26,6 @@ LICENSE
 import os
 import datetime
 import sqlite3
-import sys
 from typing import Dict
 from comunio.scraper.ComunioSession import ComunioSession
 
@@ -48,12 +47,12 @@ class DatabaseManager(object):
         if not os.path.isdir(comunio_dir):
             os.makedirs(comunio_dir)
 
-        self.comunio_session = comunio_session
-        self.database = sqlite3.connect(database_path)
-        self.apply_schema()
+        self.__comunio_session = comunio_session
+        self.__database = sqlite3.connect(database_path)
+        self.__apply_schema()
         self.update_database()
 
-    def apply_schema(self) -> None:
+    def __apply_schema(self) -> None:
         """
         Ensures that the correct schema is present in the connected database file
 
@@ -79,10 +78,10 @@ class DatabaseManager(object):
                         "team_value INTEGER NOT NULL" \
                         ");"
 
-        self.database.execute(player_table + player_info_table + manager_stats)
-        self.database.commit()
+        self.__database.execute(player_table + player_info_table + manager_stats)
+        self.__database.commit()
 
-    def update_db(self) -> None:
+    def update_database(self) -> None:
         """
         Updates the local database with current information from comunio
 
@@ -96,13 +95,17 @@ class DatabaseManager(object):
 
         if len(today_results) == 0:  # Check if today's data has already been entered
 
-            players = self.comunio.get_own_player_list()
-            cash = self.comunio.money
-            teamvalue = self.comunio.teamvalue
+            players = self.comunio_session.get_own_player_list()
+            cash = self.comunio_session.get_cash()
+            teamvalue = self.comunio_session.get_team_value()
 
             sql = "INSERT INTO players (name, value, points, position, date) VALUES(?, ?, ?, ?, ?)"
             for player in players:
-                self.database.execute(sql, (player["name"], player["value"], player["points"], player["position"], date))
+                self.database.execute(sql, (player["name"],
+                                            player["value"],
+                                            player["points"],
+                                            player["position"],
+                                            date))
 
             sql = "INSERT INTO assets (date, cash, teamvalue) VALUES(?, ?, ?)"
             self.database.execute(sql, (date, cash, teamvalue))
@@ -110,6 +113,9 @@ class DatabaseManager(object):
             print(self.database.execute("SELECT * FROM player_info").fetchall())
 
             self.database.commit()
+
+    def
+
 
     def get_total_delta(self) -> int:
         return self.comunio.money + self.comunio.teamvalue - 40000000
@@ -154,22 +160,3 @@ class DatabaseManager(object):
                 pass
 
         return player_tends
-
-if __name__ == '__main__':
-
-    db = ComunioDb(sys.argv[1], sys.argv[2])
-    print("Cash:        {:,}".format(db.comunio.money))
-    print("Team Value:  {:,}".format(db.comunio.teamvalue))
-    print("Total Delta: {:,}\n".format(db.get_total_delta()))
-
-    exit()
-
-    print("Player Deltas:")
-    player_deltas = db.get_player_deltas()
-    for player in player_deltas:
-        print((player + ": ").ljust(20) + "{:,}".format(player_deltas[player]))
-
-    print("Player Tendencies:")
-    player_tends = db.get_player_tendencies()
-    for player in player_tends:
-        print((player + ": ").ljust(20) + "{:,}".format(player_tends[player]))

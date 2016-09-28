@@ -42,16 +42,16 @@ class ComunioSession:
         # We don't store the username and password to avoid having this stored in memory,
         # instead, we use a session to stay logged in
 
-        self.money = 0
-        self.teamvalue = 0
-        self.comunio_id = ""
-        self.player_name = ""
-        self.screen_name = ""
+        self.__cash = 0
+        self.__team_value = 0
+        self.__comunio_id = ""
+        self.__player_name = ""
+        self.__screen_name = ""
 
-        self.session = requests.session()
-        self.login(username, password)
+        self.__session = requests.session()
+        self.__login(username, password)
 
-    def login(self, username: str, password: str) -> None:
+    def __login(self, username: str, password: str) -> None:
         """
         Logs in the user and creates a logged in session object for further queries
 
@@ -63,41 +63,65 @@ class ComunioSession:
                    "pass": password,
                    "action": 'login'}
         
-        self.session.post("http://www.comunio.de/login.phtml", data=payload)
-        self.load_info()
+        self.__session.post("http://www.comunio.de/login.phtml", data=payload)
+        self.__load_info()
   
-    def load_info(self):
+    def __load_info(self):
         """
         Loads the user's most important profile information
 
         :raises ConnectionError: if the log in process failed
         :return:                 None
         """
-        html = self.session.get("http://www.comunio.de/team_news.phtml").text
+        html = self.__session.get("http://www.comunio.de/team_news.phtml").text
         soup = BeautifulSoup(html, "html.parser")
 
         if soup.find("div", {"id": "userid"}) is not None:
 
-            self.money = int(soup.find("div", {"id": "manager_money"}).p.text.strip().replace(".", "")[12:-2])
-            self.teamvalue = int(soup.find("div", {"id": "teamvalue"}).p.text.strip().replace(".", "")[17:-2])
-            self.comunio_id = soup.find("div", {"id": "userid"}).p.text.strip()[6:]
+            self.__cash = int(soup.find("div", {"id": "manager_money"}).p.text.strip().replace(".", "")[12:-2])
+            self.__team_value = int(soup.find("div", {"id": "teamvalue"}).p.text.strip().replace(".", "")[17:-2])
+            self.__comunio_id = soup.find("div", {"id": "userid"}).p.text.strip()[6:]
 
-            screen_name_html = self.session.get("http://www.comunio.de/playerInfo.phtml?pid=" + self.comunio_id).text
+            screen_name_html = self.__session.get(
+                "http://www.comunio.de/playerInfo.phtml?pid=" + self.__comunio_id).text
             screen_name_soup = BeautifulSoup(screen_name_html, "html.parser")
-            self.player_name = screen_name_soup.find("div", {"id": "title"}).h1.text
-            self.screen_name = self.player_name.split("\xa0")[0]
+
+            self.__player_name = screen_name_soup.find("div", {"id": "title"}).h1.text
+            self.__screen_name = self.__player_name.split("\xa0")[0]
 
         else:
             raise ConnectionError("Log In failed, incorrect credentials?")
 
+    def get_cash(self) -> int:
+        """
+        :return: The player's current amount of liquid assets
+        """
+        return self.__cash
+
+    def get_team_value(self) -> int:
+        """
+        :return: The player's team's current market value on comunio
+        """
+        return self.__team_value
+
     def get_own_player_list(self):
         """
-        :return: A list of the user's players as dictionaries
+        Creates dictionaries modelling the user's cureent players and returns them
+        in a list.
+
+        The format of these dictionaries is:
+
+        name:     The player's name
+        value:    The player's current value
+        points:   The player's currently accumulated performance points
+        position: The player's position
+
+        :return:  A list of the user's players as dictionaries
         """
         player_list = []
 
-        sell_html = self.session.get("http://www.comunio.de/putOnExchangemarket.phtml")
-        on_sale_html = self.session.get("http://www.comunio.de/exchangemarket.phtml?takeplayeroff_x=22")
+        sell_html = self.__session.get("http://www.comunio.de/putOnExchangemarket.phtml")
+        on_sale_html = self.__session.get("http://www.comunio.de/exchangemarket.phtml?takeplayeroff_x=22")
         soups = (BeautifulSoup(sell_html.text, "html.parser"), BeautifulSoup(on_sale_html.text, "html.parser"))
 
         for i, soup in enumerate(soups):
@@ -122,6 +146,7 @@ class ComunioSession:
 
         return player_list
 
+    """
     def get_transfers(self):
 
         transfers = []
@@ -137,3 +162,4 @@ class ComunioSession:
                 }
 
         return transfers
+    """
