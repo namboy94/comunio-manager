@@ -29,7 +29,7 @@ from comunio.ui.stats import Ui_StatisticsWindow
 from comunio.scraper.ComunioSession import ComunioSession
 from comunio.database.DatabaseManager import DatabaseManager
 from comunio.calc.StatisticsCalculator import StatisticsCalculator
-from PyQt5.QtWidgets import QMainWindow, QApplication, QHeaderView
+from PyQt5.QtWidgets import QMainWindow, QApplication, QHeaderView, QTreeWidgetItem
 
 
 class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
@@ -61,13 +61,61 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
             team_value = comunio_session.get_team_value()
             display_name = comunio_session.get_screen_name()
         else:
-            cash = database_manager.get_last_cash_amount()#team_value = database_manager.get_last_team_value_amount()
+            cash = database_manager.get_last_cash_amount()
+            team_value = database_manager.get_last_team_value_amount()
             display_name = "offline viewing"
 
-        print(cash)
-
         self.greeting_label.setText(self.greeting_label.text().replace("<username>", display_name))
-        self.cash_display.setText("{}".format(cash))
+        self.cash_display.setText("{:,}€".format(cash))
+        self.team_value_display.setText("{:,}€".format(team_value))
+
+        self.__fill_player_table()
+
+    def __fill_player_table(self) -> None:
+        """
+        Fills the player table with the current data in the local database
+        :return: None
+        """
+        unordered_players = self.__database_manager.get_players_on_day(0)
+        players = []
+
+        # Sort the player entries
+        order = ["Torhüter", "Abwehr", "Mittelfeld", "Sturm"]
+        for position in order:
+            for player in unordered_players:
+                if player["position"] == position:
+                    players.append(player)
+
+        for player in players:
+
+            position = player["position"]
+            name = player["name"]
+            points = str(player["points"])
+            current_value = player["value"]
+            buy_value = self.__database_manager.get_player_buy_value(name)
+            total_player_delta = current_value - buy_value
+
+            yesterday_value = self.__database_manager.get_player_on_day(name, -1)
+            try:
+                yesterday_value = yesterday_value["value"]
+                tendency = current_value - yesterday_value
+                tendency = "{:,}€".format(current_value)
+            except TypeError:
+                yesterday_value = "---"
+                tendency = "---"
+
+            buy_value = "{:,}".format(buy_value)
+            current_value = "{:,}€".format(current_value)
+            total_player_delta = "{:,}€".format(total_player_delta)
+
+            self.player_table.addTopLevelItem(QTreeWidgetItem([position,
+                                                               name,
+                                                               points,
+                                                               buy_value,
+                                                               yesterday_value,
+                                                               current_value,
+                                                               total_player_delta,
+                                                               tendency]))
 
 
 def start(comunio_session: ComunioSession or None, database_manager: DatabaseManager) -> None:

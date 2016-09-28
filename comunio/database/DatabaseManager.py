@@ -43,8 +43,7 @@ class DatabaseManager(object):
                                 It is safe to pass None as an argument, however, updating the database will not
                                 be possible.
         """
-        date = datetime.datetime.utcnow()
-        self.__date = str(date.year).zfill(4) + "-" + str(date.month).zfill(2) + "-" + str(date.day).zfill(2)
+        self.__date = self.__create_sqlite_date(0)
 
         comunio_dir = os.path.join(os.path.expanduser("~"), ".comunio")
         database_path = os.path.join(comunio_dir, "history.db")
@@ -56,6 +55,25 @@ class DatabaseManager(object):
         self.__database = sqlite3.connect(database_path)
         self.__apply_schema()
         self.update_database()
+
+    # noinspection PyMethodMayBeStatic
+    def __create_sqlite_date(self, day: int = 0) -> str:
+        """
+        Creates a date string in the format YYYY-MM-DD for a given day:
+
+        0 is today, 1 is tomorrow, -1 is yesterday
+
+        :param day: the day to format
+        :return: the formatted date
+        """
+        date = datetime.datetime.utcnow()
+
+        if day > 0:
+            date += datetime.timedelta(days=day)
+        elif day < 0:
+            date -= datetime.timedelta(days=-(1 * day))
+
+        return str(date.year).zfill(4) + "-" + str(date.month).zfill(2) + "-" + str(date.day).zfill(2)
 
     def __apply_schema(self) -> None:
         """
@@ -233,8 +251,7 @@ class DatabaseManager(object):
         if day > 0:
             raise ValueError("Day must be 0 or negative")
 
-        date = datetime.datetime.utcnow() - datetime.timedelta(days=(day * -1))
-        date = str(date.year).zfill(4) + "-" + str(date.month).zfill(2) + "-" + str(date.day).zfill(2)
+        date = self.__create_sqlite_date(day)
 
         players = []
         database_results = self.__database.execute("SELECT * FROM players WHERE date = ?", (date, )).fetchall()
@@ -250,6 +267,34 @@ class DatabaseManager(object):
 
         return players
 
+    def get_player_on_day(self, name: str, day: int = 0) -> Dict[str, str or int] or None:
+        """
+        Fetches the current information for a single player specified by name. The information is
+        returned as a dictionary in the following format:
+
+        name:     The player's name
+        value:    The player's current value
+        points:   The player's currently accumulated performance points
+        position: The player's position
+
+        :param name: the name of the player
+        :param day: the requested day
+        :return: Dictionary containing the player's information, if no entry was found however, return None
+        """
+        date = self.__create_sqlite_date(day)
+        try:
+            player_info = self.__database.execute("SELECT value, position, points "
+                                                  "FROM players WHERE name = ? AND date = ?",
+                                                  (name, date)).fetchall()[0]
+            return {
+                "name": name,
+                "value": player_info[0],
+                "position": player_info[1],
+                "points": player_info[2]
+            }
+        except IndexError:
+            return None
+
     def get_player_buy_values(self) -> Dict[str, int]:
         """
         Fetches all player's buy values, i.e. the price for which they were bought
@@ -264,6 +309,15 @@ class DatabaseManager(object):
             buy_values[player[0]] = player[1]
         return buy_values
 
+    def get_player_buy_value(self, name: str) -> int:
+        """
+        Fetches a single player's buy value
+
+        :param name: the name of the player
+        :return: the buy value
+        """
+        return self.__database.execute("SELECT buy_value FROM player_info WHERE name = ?", (name, )).fetchall()[0][0]
+
     def get_last_cash_amount(self) -> int:
         """
         :return: The last recorded cash amount
@@ -274,4 +328,4 @@ class DatabaseManager(object):
         """
         :return: The last recorded team value
         """
-        return self.__database.execute("SELECT team_value FROM manager_stats WHERE date = MAX(date)").fetchall()[0]
+        return self.__database.execute("SELECT team_value, MAX(date) FROM manager_stats").fetchall()[0][0]
