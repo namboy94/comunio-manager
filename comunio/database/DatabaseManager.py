@@ -35,11 +35,13 @@ class DatabaseManager(object):
     Class that manages the local comunio database
     """
 
-    def __init__(self, comunio_session: ComunioSession) -> None:
+    def __init__(self, comunio_session: ComunioSession or None) -> None:
         """
         Initializes the DatabaseManager object using a previously established comunio session
 
         :param comunio_session: A previously established comunio session
+                                It is safe to pass None as an argument, however, updating the database will not
+                                be possible.
         """
         date = datetime.datetime.utcnow()
         self.__date = str(date.year).zfill(4) + "-" + str(date.month).zfill(2) + "-" + str(date.day).zfill(2)
@@ -198,6 +200,9 @@ class DatabaseManager(object):
 
         :return: None
         """
+        if self.__comunio_session is None:
+            return
+
         today_results = self.__database.execute("SELECT * FROM players WHERE date = ?", (self.__date,)).fetchall()
 
         if len(today_results) == 0:  # Check if today's data has already been entered
@@ -258,3 +263,15 @@ class DatabaseManager(object):
         for player in players:
             buy_values[player[0]] = player[1]
         return buy_values
+
+    def get_last_cash_amount(self) -> int:
+        """
+        :return: The last recorded cash amount
+        """
+        return self.__database.execute("SELECT cash, MAX(date) FROM manager_stats").fetchall()[0][0]
+
+    def get_last_team_value_amount(self) -> int:
+        """
+        :return: The last recorded team value
+        """
+        return self.__database.execute("SELECT team_value FROM manager_stats WHERE date = MAX(date)").fetchall()[0]

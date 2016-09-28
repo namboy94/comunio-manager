@@ -22,9 +22,34 @@ This file is part of comunio-manager.
 LICENSE
 """
 
+# imports
+import argparse
+from comunio.ui.StatisticsViewer import start as start_gui
 from comunio.scraper.ComunioSession import ComunioSession
 from comunio.database.DatabaseManager import DatabaseManager
 
 
-comunio = ComunioSession("namboy1994", "Eragon11")
-db = DatabaseManager(comunio)
+def main() -> None:
+    """
+    Starts the Program by analyzing the given command line parameters and acting accordingly
+
+    :return: None
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument("username",  help="The username with which to log in to comunio.de")
+    parser.add_argument("password", help="The password with which to log in to comunio.de")
+    parser.add_argument("-g", "--gui", action="store_true", help="Starts the program in GUI mode")
+    args = parser.parse_args()
+
+    try:
+        comunio = ComunioSession(args.username, args.password)
+    except:
+        comunio = None
+
+    database = DatabaseManager(comunio)
+
+    if args.gui:
+        start_gui(comunio, database)
+
+if __name__ == '__main__':
+    main()

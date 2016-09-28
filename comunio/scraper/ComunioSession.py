@@ -146,6 +146,12 @@ class ComunioSession:
         """
         return self.__team_value
 
+    def get_screen_name(self) -> str:
+        """
+        :return: The Comunio Screen Name
+        """
+        return self.__screen_name
+
     def get_own_player_list(self) -> List[Dict[str, str or int]]:
         """
         Creates dictionaries modelling the user's current players and returns them
