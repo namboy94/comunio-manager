@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1010</width>
-    <height>489</height>
+    <width>937</width>
+    <height>711</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,6 +15,13 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
+    <item row="1" column="5">
+     <widget class="QLabel" name="total_assets_display">
+      <property name="text">
+       <string>0€</string>
+      </property>
+     </widget>
+    </item>
     <item row="0" column="0">
      <widget class="QLabel" name="greeting_label">
       <property name="text">
@@ -22,7 +29,7 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
+    <item row="0" column="2">
      <spacer name="horizontalSpacer">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -35,21 +42,21 @@
       </property>
      </spacer>
     </item>
-    <item row="0" column="2">
+    <item row="0" column="3">
      <widget class="QLabel" name="label_3">
       <property name="text">
        <string>Cash</string>
       </property>
      </widget>
     </item>
-    <item row="0" column="3">
+    <item row="0" column="4">
      <widget class="QLabel" name="label_2">
       <property name="text">
        <string>Team Value</string>
       </property>
      </widget>
     </item>
-    <item row="1" column="0" colspan="2">
+    <item row="1" column="0" colspan="3">
      <spacer name="horizontalSpacer_2">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -62,21 +69,98 @@
       </property>
      </spacer>
     </item>
-    <item row="1" column="3">
+    <item row="1" column="4">
      <widget class="QLabel" name="team_value_display">
       <property name="text">
        <string>0€</string>
       </property>
      </widget>
     </item>
-    <item row="1" column="2">
+    <item row="1" column="3">
      <widget class="QLabel" name="cash_display">
       <property name="text">
        <string>0€</string>
       </property>
      </widget>
     </item>
-    <item row="2" column="0" colspan="4">
+    <item row="0" column="5">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Total Assets</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="label_7">
+      <property name="text">
+       <string>Position</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="label_5">
+      <property name="text">
+       <string>Name</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="0">
+     <widget class="QLabel" name="label_6">
+      <property name="text">
+       <string>Value</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QLabel" name="player_name_label">
+      <property name="text">
+       <string>-</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="1">
+     <widget class="QLabel" name="player_value_label">
+      <property name="text">
+       <string>-</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QLabel" name="player_position_label">
+      <property name="text">
+       <string>-</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0">
+     <widget class="QLabel" name="label_11">
+      <property name="text">
+       <string>Points</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QLabel" name="player_points_label">
+      <property name="text">
+       <string>-</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="6">
+     <widget class="QLabel" name="label_4">
+      <property name="text">
+       <string>Balance</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="6">
+     <widget class="QLabel" name="balance_display">
+      <property name="text">
+       <string>0€</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0" colspan="7">
      <widget class="QTreeWidget" name="player_table">
       <property name="minimumSize">
        <size>
@@ -125,6 +209,9 @@
        </property>
       </column>
      </widget>
+    </item>
+    <item row="3" column="2" rowspan="4" colspan="5">
+     <widget class="QGraphicsView" name="player_graph"/>
     </item>
    </layout>
   </widget>

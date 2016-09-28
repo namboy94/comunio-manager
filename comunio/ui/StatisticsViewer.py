@@ -99,7 +99,7 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
             try:
                 yesterday_value = yesterday_value["value"]
                 tendency = current_value - yesterday_value
-                tendency = "{:,}€".format(current_value)
+                tendency = "{:,}€".format(tendency)
             except TypeError:
                 yesterday_value = "---"
                 tendency = "---"
