@@ -114,6 +114,63 @@ class DatabaseManager(object):
                                       self.__comunio_session.get_team_value()))
         self.__database.commit()
 
+    def __update_transfers(self) -> None:
+        """
+        Updates transfers from the comunio website and adds them into the database
+
+        :return: None
+        """
+        # TODO split up method into individual methods
+
+        # Check for Transfers using Comunio's news section for today
+        transfers = self.__comunio_session.get_today_transfers()
+        for transfer in transfers:
+            if transfer["type"] == "bought":
+                self.__database.execute("INSERT INTO player_info (name, buy_value, sell_value) VALUES(?, ?, NULL)",
+                                        (transfer["name"], transfer["value"]))
+            else:
+                self.__database.execute("UPDATE player_info SET sell_value = ? WHERE name = ?",
+                                        (transfer["value"], transfer["name"]))
+
+        player_infos = self.__database.execute("SELECT name FROM player_info WHERE sell_value = NULL").fetchall()
+
+        # Insert any missing players wit today's market value
+        for player in self.get_players_on_day(0):
+            if player["name"] not in player_infos:
+                self.__database.execute("INSERT INTO player_info (name, buy_value, sell_value) VALUES(?, ?, NULL)",
+                                        (player["name"], player["value"]))
+
+        # Mark every player that is no longer in the team as sold using the last known market value
+        for player in player_infos:
+
+            is_still_in_team = False
+            for today_player in self.get_players_on_day(0):
+                if today_player["name"] == player:
+                    is_still_in_team = True
+                    break
+
+            if not is_still_in_team:
+
+                market_value = None
+                day_counter = -1
+
+                while market_value is None:
+                    for older_player in self.get_players_on_day(day_counter):
+                        if older_player["name"] == player:
+                            market_value = older_player["value"]
+                            break
+
+                    day_counter -= 1
+
+                    if day_counter < 15:
+                        market_value = self.__database.execute("SELECT buy_value FROM player_info WHERE name = ?",
+                                                               (player,)).fetchall()[0]
+
+                self.__database.execute("UPDATE player_info SET sell_value = ? WHERE name = ?",
+                                        (market_value, player))
+
+        self.__database.commit()
+
     def update_database(self) -> None:
         """
         Updates the local database with current information from comunio
@@ -126,6 +183,7 @@ class DatabaseManager(object):
 
             self.__update_players_table()
             self.__update_manager_stats_table()
+            self.__update_transfers()
 
     def get_players_on_day(self, day: int = 0) -> List[Dict[str, str or int]]:
         """
@@ -177,4 +235,3 @@ class DatabaseManager(object):
         for player in players:
             buy_values[player[0]] = player[1]
         return buy_values
-

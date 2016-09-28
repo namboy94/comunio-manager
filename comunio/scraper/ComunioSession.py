@@ -206,12 +206,13 @@ class ComunioSession:
             if article["type"] == "Transfers" and article["date"] == date:
 
                 transfer_text = article["content"]
+                print(repr(transfer_text))
 
                 while True:
                     player_name, transfer_text = transfer_text.split(" wechselt für ", 1)
                     amount, transfer_text = transfer_text.split(" von ", 1)
                     seller_name, transfer_text = transfer_text.split(" zu ", 1)
-                    buyer_name = transfer_text.split(".", 1)
+                    buyer_name, transfer_text = transfer_text.split(".", 1)
 
                     transfer = {"name": player_name,
                                 "amount": int(amount.replace(".", ""))}
@@ -219,4 +220,8 @@ class ComunioSession:
                     if seller_name == self.__screen_name or buyer_name == self.__screen_name:
                         transfer["type"] = "bought" if buyer_name == self.__screen_name else "sold"
                         transfers.append(transfer)
+
+                    if len(transfer_text) == 0:
+                        break
+
         return transfers
