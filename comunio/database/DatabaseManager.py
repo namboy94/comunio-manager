@@ -114,15 +114,12 @@ class DatabaseManager(object):
                                       self.__comunio_session.get_team_value()))
         self.__database.commit()
 
-    def __update_transfers(self) -> None:
+    def __update_transfers_from_news(self) -> None:
         """
-        Updates transfers from the comunio website and adds them into the database
+        Updates transfers based on today's comunio news articles. Most accurate way of updating a transfer
 
         :return: None
         """
-        # TODO split up method into individual methods
-
-        # Check for Transfers using Comunio's news section for today
         transfers = self.__comunio_session.get_today_transfers()
         for transfer in transfers:
             if transfer["type"] == "bought":
@@ -131,16 +128,40 @@ class DatabaseManager(object):
             else:
                 self.__database.execute("UPDATE player_info SET sell_value = ? WHERE name = ?",
                                         (transfer["value"], transfer["name"]))
+        self.__database.commit()
+
+    def __update_transfers_from_unregistered_player(self) -> None:
+        """
+        Updates the transfers based on unregistered players, i.e. a player that appears in today's
+        comunio team but not in the player_info table.
+
+        Data loss occurs with this method, since the market value is registered as the buy_value instead
+        of the actual price
+
+        :return: None
+        """
 
         player_infos = self.__database.execute("SELECT name FROM player_info WHERE sell_value = NULL").fetchall()
 
-        # Insert any missing players wit today's market value
         for player in self.get_players_on_day(0):
             if player["name"] not in player_infos:
                 self.__database.execute("INSERT INTO player_info (name, buy_value, sell_value) VALUES(?, ?, NULL)",
                                         (player["name"], player["value"]))
+        self.__database.commit()
 
-        # Mark every player that is no longer in the team as sold using the last known market value
+    def __update_transfers_from_missing_player(self) -> None:
+        """
+        Updates transfers based on players that appear in the player_info and do not have a non-NULL sell_value
+        but do not appear in today's list of players.
+
+        This method is prone to loss of information, since the new sell_value is determined by using the last known
+        market value. If an appropriate previous market value was not found in the last 15 entries, the
+        initial buy_value is used.
+
+        :return: None
+        """
+        player_infos = self.__database.execute("SELECT name FROM player_info WHERE sell_value = NULL").fetchall()
+
         for player in player_infos:
 
             is_still_in_team = False
@@ -183,7 +204,9 @@ class DatabaseManager(object):
 
             self.__update_players_table()
             self.__update_manager_stats_table()
-            self.__update_transfers()
+            self.__update_transfers_from_news()
+            self.__update_transfers_from_missing_player()
+            self.__update_transfers_from_unregistered_player()
 
     def get_players_on_day(self, day: int = 0) -> List[Dict[str, str or int]]:
         """
