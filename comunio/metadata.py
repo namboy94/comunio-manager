@@ -77,7 +77,7 @@ license_type = "GNU GPL3"
 The project's license type
 """
 
-dependencies = ["raven", "requests", "bs4"]
+dependencies = ["raven", "requests", "bs4", "matplotlib"]
 """
 Python Packaging Index requirements
 """

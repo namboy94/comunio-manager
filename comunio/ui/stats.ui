@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>896</width>
-    <height>725</height>
+    <height>536</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="7">
+    <item row="1" column="9">
      <widget class="QLabel" name="total_assets_display">
       <property name="text">
        <string>0€</string>
@@ -49,7 +49,7 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="5">
+    <item row="0" column="7">
      <widget class="QLabel" name="label_2">
       <property name="text">
        <string>Team Value</string>
@@ -69,7 +69,7 @@
       </property>
      </spacer>
     </item>
-    <item row="1" column="5">
+    <item row="1" column="7">
      <widget class="QLabel" name="team_value_display">
       <property name="text">
        <string>0€</string>
@@ -83,14 +83,14 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="7">
+    <item row="0" column="9">
      <widget class="QLabel" name="label">
       <property name="text">
        <string>Total Assets</string>
       </property>
      </widget>
     </item>
-    <item row="0" column="8">
+    <item row="0" column="10">
      <spacer name="horizontalSpacer_5">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -106,7 +106,7 @@
       </property>
      </spacer>
     </item>
-    <item row="0" column="6">
+    <item row="0" column="8">
      <spacer name="horizontalSpacer_4">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -178,14 +178,14 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="9">
+    <item row="1" column="11">
      <widget class="QLabel" name="balance_display">
       <property name="text">
        <string>0€</string>
       </property>
      </widget>
     </item>
-    <item row="0" column="9">
+    <item row="0" column="11">
      <widget class="QLabel" name="label_4">
       <property name="text">
        <string>Balance</string>
@@ -208,10 +208,7 @@
       </property>
      </spacer>
     </item>
-    <item row="3" column="5" rowspan="4" colspan="6">
-     <widget class="QGraphicsView" name="player_value_graph"/>
-    </item>
-    <item row="2" column="0" colspan="11">
+    <item row="2" column="0" colspan="13">
      <widget class="QTreeWidget" name="player_table">
       <property name="minimumSize">
        <size>
@@ -261,8 +258,38 @@
       </column>
      </widget>
     </item>
-    <item row="3" column="2" rowspan="4" colspan="3">
-     <widget class="QGraphicsView" name="player_points_graph"/>
+    <item row="7" column="0">
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>40</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="3" column="2" rowspan="5" colspan="2">
+     <widget class="QLabel" name="points_graph">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>192</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Points</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="4" rowspan="5" colspan="8">
+     <widget class="QLabel" name="value_graph">
+      <property name="text">
+       <string>Values</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>

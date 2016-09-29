@@ -24,7 +24,12 @@ LICENSE
 
 
 # imports
+import os
 import sys
+import datetime
+from PyQt5.QtGui import QPixmap
+import matplotlib.dates as dates
+import matplotlib.pyplot as pyplot
 from comunio.ui.stats import Ui_StatisticsWindow
 from comunio.scraper.ComunioSession import ComunioSession
 from comunio.database.DatabaseManager import DatabaseManager
@@ -49,6 +54,7 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
         super().__init__(parent)
         self.setupUi(self)
 
+        self.__pyplot_figure = pyplot.figure()
         self.__players = []
 
         self.__comunio_session = comunio_session
@@ -137,6 +143,7 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
         self.player_points_label.setText(str(player["points"]))
         self.player_value_label.setText("{:,}".format(player["value"]))
         self.fill_player_value_graph(player["name"])
+        self.fill_player_points_graph(player["name"])
 
     def fill_player_value_graph(self, player: str) -> None:
         """
@@ -147,7 +154,29 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
         :return:       None
         """
         historic_data = self.__database_manager.get_historic_data_for_player(player)
-        # TODO Fill the graph
+
+        x_values = []
+        y_values = []
+
+        i = len(historic_data) - 1
+        while i > -1:
+            data_point = historic_data[i]
+            x_values.append(datetime.datetime.strptime(data_point[1], "%Y-%m-%d").date())
+            y_values.append(data_point[0]["value"])
+            i -= 1
+
+        pyplot.gca().xaxis.set_major_formatter(dates.DateFormatter("%Y-%m-%d"))
+        pyplot.gca().xaxis.set_major_locator(dates.DayLocator())
+        pyplot.plot(x_values, y_values, "-o")
+        pyplot.gcf().autofmt_xdate()
+        pyplot.axis([x_values[0], x_values[len(x_values) - 1], 0, max(y_values) + 1000000])
+
+        image = os.path.join(os.path.expanduser("~"), ".comunio", "temp_value.png")
+        self.__pyplot_figure.savefig(image, dpi=self.__pyplot_figure.dpi)
+        self.__pyplot_figure.clear()
+
+        pixmap = QPixmap(image)
+        self.value_graph.setPixmap(pixmap)
 
     def fill_player_points_graph(self, player: str) -> None:
         """
@@ -157,7 +186,29 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
         :return: None
         """
         historic_data = self.__database_manager.get_historic_data_for_player(player)
-        # TODO Fill the graph
+
+        x_values = []
+        y_values = []
+
+        i = len(historic_data) - 1
+        while i > -1:
+            data_point = historic_data[i]
+            x_values.append(datetime.datetime.strptime(data_point[1], "%Y-%m-%d").date())
+            y_values.append(data_point[0]["points"])
+            i -= 1
+
+        pyplot.gca().xaxis.set_major_formatter(dates.DateFormatter("%Y-%m-%d"))
+        pyplot.gca().xaxis.set_major_locator(dates.DayLocator())
+        pyplot.plot(x_values, y_values, "-o")
+        pyplot.gcf().autofmt_xdate()
+        pyplot.axis([x_values[0], x_values[len(x_values) - 1], min(y_values) - 2, max(y_values) + 2])
+
+        image = os.path.join(os.path.expanduser("~"), ".comunio", "temp_value.png")
+        self.__pyplot_figure.savefig(image, dpi=self.__pyplot_figure.dpi)
+        self.__pyplot_figure.clear()
+
+        pixmap = QPixmap(image)
+        self.points_graph.setPixmap(pixmap)
 
 
 def start(comunio_session: ComunioSession or None, database_manager: DatabaseManager) -> None:
