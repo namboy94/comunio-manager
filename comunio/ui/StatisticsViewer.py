@@ -27,7 +27,7 @@ LICENSE
 import os
 import sys
 import datetime
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QBrush, QColor
 import matplotlib.dates as dates
 import matplotlib.pyplot as pyplot
 from comunio.ui.stats import Ui_StatisticsWindow
@@ -87,6 +87,10 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
         unordered_players = self.__database_manager.get_players_on_day(0)
         players = []
 
+        red = QBrush(QColor(239, 41, 41))
+        green = QBrush(QColor(115, 210, 22))
+        yellow = QBrush(QColor(237, 212, 0))
+
         # Sort the player entries
         order = ["Torhüter", "Abwehr", "Mittelfeld", "Sturm"]
         for position in order:
@@ -105,29 +109,43 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
             buy_value = self.__database_manager.get_player_buy_value(name)
             total_player_delta = current_value - buy_value
 
+            if total_player_delta > 0:
+                total_player_delta_bg = green
+            elif total_player_delta == 0:
+                total_player_delta_bg = yellow
+            else:
+                total_player_delta_bg = red
+
             yesterday_value = self.__database_manager.get_player_on_day(name, -1)
             try:
                 yesterday_value = yesterday_value["value"]
                 tendency = current_value - yesterday_value
                 yesterday_value = "{:,}".format(yesterday_value)
+
+                if tendency > 0:
+                    tendency_bg = green
+                elif tendency == 0:
+                    tendency_bg = yellow
+                else:
+                    tendency_bg = red
+
                 tendency = "{:,}€".format(tendency)
+
             except TypeError:
                 yesterday_value = "---"
                 tendency = "---"
+                tendency_bg = yellow
 
             buy_value = "{:,}".format(buy_value)
             current_value = "{:,}€".format(current_value)
             total_player_delta = "{:,}€".format(total_player_delta)
 
-            # TODO Colour the items according to their values
-            self.player_table.addTopLevelItem(QTreeWidgetItem([position,
-                                                               name,
-                                                               points,
-                                                               buy_value,
-                                                               yesterday_value,
-                                                               current_value,
-                                                               total_player_delta,
-                                                               tendency]))
+            tree_widget_item = QTreeWidgetItem([position, name, points, buy_value, yesterday_value,
+                                                current_value, total_player_delta, tendency])
+            self.player_table.addTopLevelItem(tree_widget_item)
+
+            tree_widget_item.setBackground(6, total_player_delta_bg)
+            tree_widget_item.setBackground(7, tendency_bg)
 
     def __select_player(self) -> None:
         """
@@ -142,73 +160,47 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
         self.player_position_label.setText(player["position"])
         self.player_points_label.setText(str(player["points"]))
         self.player_value_label.setText("{:,}".format(player["value"]))
-        self.fill_player_value_graph(player["name"])
-        self.fill_player_points_graph(player["name"])
+        self.fill_graphs(player["name"])
 
-    def fill_player_value_graph(self, player: str) -> None:
+    def fill_graphs(self, player: str) -> None:
         """
         Fills the player value graph widget with a graph displaying the player's previous values
-        over time
+        over time as well as the player points graph with the player's points over time
 
         :param player: The name of the player whose graph should be generated
         :return:       None
         """
         historic_data = self.__database_manager.get_historic_data_for_player(player)
 
-        x_values = []
-        y_values = []
+        for graph in ["value", "points"]:
 
-        i = len(historic_data) - 1
-        while i > -1:
-            data_point = historic_data[i]
-            x_values.append(datetime.datetime.strptime(data_point[1], "%Y-%m-%d").date())
-            y_values.append(data_point[0]["value"])
-            i -= 1
+            x_values = []
+            y_values = []
 
-        pyplot.gca().xaxis.set_major_formatter(dates.DateFormatter("%Y-%m-%d"))
-        pyplot.gca().xaxis.set_major_locator(dates.DayLocator())
-        pyplot.plot(x_values, y_values, "-o")
-        pyplot.gcf().autofmt_xdate()
-        pyplot.axis([x_values[0], x_values[len(x_values) - 1], 0, max(y_values) + 1000000])
+            i = len(historic_data) - 1
+            while i > -1:
+                data_point = historic_data[i]
+                x_values.append(datetime.datetime.strptime(data_point[1], "%Y-%m-%d").date())
+                y_values.append(data_point[0][graph])
+                i -= 1
 
-        image = os.path.join(os.path.expanduser("~"), ".comunio", "temp_value.png")
-        self.__pyplot_figure.savefig(image, dpi=self.__pyplot_figure.dpi)
-        self.__pyplot_figure.clear()
+            pyplot.gca().xaxis.set_major_formatter(dates.DateFormatter("%Y-%m-%d"))
+            pyplot.gca().xaxis.set_major_locator(dates.DayLocator())
+            pyplot.plot(x_values, y_values, "-o")
+            pyplot.gcf().autofmt_xdate()
 
-        pixmap = QPixmap(image)
-        self.value_graph.setPixmap(pixmap)
+            y_min_padder = 0 if graph == "value" else -2
+            y_max_padder = 1000000 if graph == "value" else 2
+            pyplot.axis([x_values[0], x_values[len(x_values) - 1], y_min_padder, max(y_values) + y_max_padder])
 
-    def fill_player_points_graph(self, player: str) -> None:
-        """
-        Fills the points graph of the currently selected player
+            image_path = os.path.join(os.path.expanduser("~"), ".comunio", "temp.png")
+            self.__pyplot_figure.savefig(image_path, dpi=self.__pyplot_figure.dpi/2)
+            self.__pyplot_figure.clear()
 
-        :param player: the name of the player whose graph should be filled
-        :return: None
-        """
-        historic_data = self.__database_manager.get_historic_data_for_player(player)
+            pixmap = QPixmap(image_path)
+            self.value_graph.setPixmap(pixmap)
 
-        x_values = []
-        y_values = []
-
-        i = len(historic_data) - 1
-        while i > -1:
-            data_point = historic_data[i]
-            x_values.append(datetime.datetime.strptime(data_point[1], "%Y-%m-%d").date())
-            y_values.append(data_point[0]["points"])
-            i -= 1
-
-        pyplot.gca().xaxis.set_major_formatter(dates.DateFormatter("%Y-%m-%d"))
-        pyplot.gca().xaxis.set_major_locator(dates.DayLocator())
-        pyplot.plot(x_values, y_values, "-o")
-        pyplot.gcf().autofmt_xdate()
-        pyplot.axis([x_values[0], x_values[len(x_values) - 1], min(y_values) - 2, max(y_values) + 2])
-
-        image = os.path.join(os.path.expanduser("~"), ".comunio", "temp_value.png")
-        self.__pyplot_figure.savefig(image, dpi=self.__pyplot_figure.dpi)
-        self.__pyplot_figure.clear()
-
-        pixmap = QPixmap(image)
-        self.points_graph.setPixmap(pixmap)
+            os.remove(image_path)
 
 
 def start(comunio_session: ComunioSession or None, database_manager: DatabaseManager) -> None:
