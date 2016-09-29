@@ -46,7 +46,7 @@ version_number = "0.1.0"
 The current version of the program.
 """
 
-development_status = "Development Status :: 1 - Planning"
+development_status = "Development Status :: 3 - Alpha"
 """
 The current development status of the program
 """
