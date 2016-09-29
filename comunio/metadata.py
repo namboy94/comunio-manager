@@ -1,24 +1,24 @@
 """
 LICENSE:
-Copyright 2016 Hermann Krumrey
+Copyright 2014 Javier Corbín (MIT License), 2016 Hermann Krumrey
 
-This file is part of xdcc_dl.
+This file is part of comunio-manager.
 
-    xdcc_dl is a program that allows downloading files via hte XDCC
-    protocol via file serving bots on IRC networks.
+    comunio-manager is a program that allows a user to track his/her comunio.de
+    profile
 
-    xdcc_dl is free software: you can redistribute it and/or modify
+    comunio-manager is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    xdcc_dl is distributed in the hope that it will be useful,
+    comunio-manager is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with xdcc_dl.  If not, see <http://www.gnu.org/licenses/>.
+    along with comunio-manager.  If not, see <http://www.gnu.org/licenses/>.
 LICENSE
 """
 
@@ -41,12 +41,12 @@ project_description = "A Comunio Desktop Application"
 A short description of the project
 """
 
-version_number = "0.0.1"
+version_number = "0.1.0"
 """
 The current version of the program.
 """
 
-development_status = "Development Status :: 1 - Planning"
+development_status = "Development Status :: 3 - Alpha"
 """
 The current development status of the program
 """
@@ -77,7 +77,7 @@ license_type = "GNU GPL3"
 The project's license type
 """
 
-dependencies = ['raven']
+dependencies = ["raven", "requests", "bs4", "matplotlib"]
 """
 Python Packaging Index requirements
 """
@@ -118,7 +118,7 @@ The license used for this project
 """
 
 # Sentry Configuration
-sentry = Client(dsn='http://978e4ecaaa6b49e2ac5bba667d2b708d:67fcad2935614f44b02681d1ae12219e@85.214.124.204:9000/4',
+sentry = Client(dsn="http://978e4ecaaa6b49e2ac5bba667d2b708d:67fcad2935614f44b02681d1ae12219e@85.214.124.204:9000/4",
                 release=version_number)
 """
 The Sentry client for logging bugs
