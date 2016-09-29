@@ -342,7 +342,7 @@ class DatabaseManager(object):
         while True:
             player_on_day = self.get_player_on_day(player, day)
             if player_on_day is not None:
-                values.append(player_on_day[("value", self.__create_sqlite_date(day))])
+                values.append((player_on_day["value"], self.__create_sqlite_date(day)))
             else:
                 date = self.__create_sqlite_date(day)
                 lowest_date = self.__database.execute("SELECT MIN(date) FROM players").fetchall()[0][0]

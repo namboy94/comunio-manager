@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>937</width>
-    <height>711</height>
+    <width>896</width>
+    <height>725</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -90,6 +90,22 @@
       </property>
      </widget>
     </item>
+    <item row="0" column="8">
+     <spacer name="horizontalSpacer_5">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Fixed</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
     <item row="0" column="6">
      <spacer name="horizontalSpacer_4">
       <property name="orientation">
@@ -162,9 +178,6 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="2" rowspan="4" colspan="8">
-     <widget class="QGraphicsView" name="player_graph"/>
-    </item>
     <item row="1" column="9">
      <widget class="QLabel" name="balance_display">
       <property name="text">
@@ -179,7 +192,26 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="0" colspan="10">
+    <item row="0" column="4">
+     <spacer name="horizontalSpacer_3">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Fixed</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="3" column="5" rowspan="4" colspan="6">
+     <widget class="QGraphicsView" name="player_value_graph"/>
+    </item>
+    <item row="2" column="0" colspan="11">
      <widget class="QTreeWidget" name="player_table">
       <property name="minimumSize">
        <size>
@@ -229,37 +261,8 @@
       </column>
      </widget>
     </item>
-    <item row="0" column="4">
-     <spacer name="horizontalSpacer_3">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeType">
-       <enum>QSizePolicy::Fixed</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>40</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="0" column="8">
-     <spacer name="horizontalSpacer_5">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeType">
-       <enum>QSizePolicy::Fixed</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>40</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
+    <item row="3" column="2" rowspan="4" colspan="3">
+     <widget class="QGraphicsView" name="player_points_graph"/>
     </item>
    </layout>
   </widget>
