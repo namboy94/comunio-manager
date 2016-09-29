@@ -35,13 +35,12 @@ class DatabaseManager(object):
     Class that manages the local comunio database
     """
 
-    def __init__(self, comunio_session: ComunioSession or None) -> None:
+    def __init__(self, comunio_session: ComunioSession) -> None:
         """
         Initializes the DatabaseManager object using a previously established comunio session
 
         :param comunio_session: A previously established comunio session
-                                It is safe to pass None as an argument, however, updating the database will not
-                                be possible.
+                                The database won't be able to update in offline mode
         """
         self.__date = self.__create_sqlite_date(0)
 
@@ -218,7 +217,7 @@ class DatabaseManager(object):
 
         :return: None
         """
-        if self.__comunio_session is None:
+        if not self.__comunio_session.is_connected():
             return
 
         today_results = self.__database.execute("SELECT * FROM players WHERE date = ?", (self.__date,)).fetchall()

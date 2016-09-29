@@ -36,21 +36,21 @@ class ComunioSession:
 
     def __init__(self, username: str, password: str) -> None:
         """
-        Constructor that creates the logged in session
+        Constructor that creates the logged in session. If any sort of network or authentication
+        error occurs, the session switches into offline mode by unsetting the __connected flag
 
         :param username:         the user's user name for comunio.de
         :param password:         the user's password
-        :raises ConnectionError: When the log in process failed. Exception message contains the
-                                 details of the cause of the exception
         """
         # We don't store the username and password to avoid having this stored in memory,
         # instead, we use a session to stay logged in
 
+        self.__connected = True
         self.__cash = 0
         self.__team_value = 0
         self.__comunio_id = ""
-        self.__player_name = ""
-        self.__screen_name = ""
+        self.__player_name = username
+        self.__screen_name = username
 
         self.__session = requests.session()
 
@@ -58,8 +58,8 @@ class ComunioSession:
         # and whenever comunio.de blocks the site for any non-pro users
         try:
             self.__login(username, password)
-        except requests.exceptions.ConnectionError:
-            raise ConnectionError("Network Error")
+        except (requests.exceptions.ConnectionError, ConnectionError):
+            self.__connected = False
 
     def __login(self, username: str, password: str) -> None:
         """
@@ -134,6 +134,12 @@ class ComunioSession:
 
         return articles
 
+    def is_connected(self) -> bool:
+        """
+        :return: If the session is connected or not
+        """
+        return self.__connected
+
     def get_cash(self) -> int:
         """
         :return: The player's current amount of liquid assets
@@ -166,6 +172,9 @@ class ComunioSession:
 
         :return:  A list of the user's players as dictionaries
         """
+        if not self.__connected:
+            return []
+
         player_list = []
 
         sell_html = self.__session.get("http://www.comunio.de/putOnExchangemarket.phtml")
@@ -204,6 +213,9 @@ class ComunioSession:
                     - amount: the transfer amount
                     - type:   "bought" or "sold" to differentiate between the two transfer types
         """
+        if not self.__connected:
+            return []
+
         date = datetime.datetime.utcnow()
         date = str(date.day).zfill(2) + "." + str(date.month).zfill(2) + "." + str(date.year)[2:4]
 

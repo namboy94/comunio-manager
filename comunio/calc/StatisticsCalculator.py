@@ -23,7 +23,6 @@ LICENSE
 """
 
 # imports
-from typing import Dict
 from comunio.scraper.ComunioSession import ComunioSession
 from comunio.database.DatabaseManager import DatabaseManager
 
@@ -33,13 +32,12 @@ class StatisticsCalculator(object):
     Class that calculates various statistics based on the current comunio data and the local database
     """
 
-    def __init__(self, comunio_session: ComunioSession or None, database_manager: DatabaseManager) -> None:
+    def __init__(self, comunio_session: ComunioSession, database_manager: DatabaseManager) -> None:
         """
         Initializes the statistics calculator with a running comunio session and a database manager
         to interface with the local database
 
-        :param comunio_session:  the comunio session - is allowed to be None, values will be calculated using
-                                                       the local database instead
+        :param comunio_session:  the comunio session
         :param database_manager: the database manager
         """
         self.__comunio_session = comunio_session
@@ -52,9 +50,5 @@ class StatisticsCalculator(object):
 
         :return: the difference between the values
         """
-        if self.__comunio_session is not None:
-            return self.__comunio_session.get_cash() + self.__comunio_session.get_team_value() - 40000000
-        else:
-            return self.__database_manager.get_last_cash_amount()\
-                   + self.__database_manager.get_last_team_value_amount()\
-                   - 40000000
+        assets = self.__database_manager.get_last_cash_amount() + self.__database_manager.get_last_team_value_amount()
+        return assets - 40000000

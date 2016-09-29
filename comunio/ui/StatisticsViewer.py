@@ -58,14 +58,9 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
         for i in range(0, 8):  # Makes headers all the same size
             self.player_table.header().setSectionResizeMode(i, QHeaderView.Stretch)
 
-        if comunio_session is not None:
-            cash = comunio_session.get_cash()
-            team_value = comunio_session.get_team_value()
-            display_name = comunio_session.get_screen_name()
-        else:
-            cash = database_manager.get_last_cash_amount()
-            team_value = database_manager.get_last_team_value_amount()
-            display_name = "offline viewing"
+        cash = database_manager.get_last_cash_amount()
+        team_value = database_manager.get_last_team_value_amount()
+        display_name = comunio_session.get_screen_name()
 
         self.greeting_label.setText(self.greeting_label.text().replace("<username>", display_name))
         self.cash_display.setText("{:,}€".format(cash))

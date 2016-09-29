@@ -41,11 +41,7 @@ def main() -> None:
     parser.add_argument("-g", "--gui", action="store_true", help="Starts the program in GUI mode")
     args = parser.parse_args()
 
-    try:
-        comunio = ComunioSession(args.username, args.password)
-    except:
-        comunio = None
-
+    comunio = ComunioSession(args.username, args.password)
     database = DatabaseManager(comunio)
 
     if args.gui:
