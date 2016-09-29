@@ -35,20 +35,25 @@ class DatabaseManager(object):
     Class that manages the local comunio database
     """
 
-    def __init__(self, comunio_session: ComunioSession) -> None:
+    def __init__(self, comunio_session: ComunioSession, database_location_override: str = "") -> None:
         """
         Initializes the DatabaseManager object using a previously established comunio session
 
-        :param comunio_session: A previously established comunio session
-                                The database won't be able to update in offline mode
+        :param comunio_session:             A previously established comunio session
+                                            The database won't be able to update in offline mode
+        :param database_location_override:  Overrules the standard database location. Useful for testing
         """
         self.__date = self.__create_sqlite_date(0)
 
-        comunio_dir = os.path.join(os.path.expanduser("~"), ".comunio")
-        database_path = os.path.join(comunio_dir, "history.db")
+        if not database_location_override:
+            comunio_dir = os.path.join(os.path.expanduser("~"), ".comunio")
+            database_path = os.path.join(comunio_dir, "history.db")
 
-        if not os.path.isdir(comunio_dir):
-            os.makedirs(comunio_dir)
+            if not os.path.isdir(comunio_dir):
+                os.makedirs(comunio_dir)
+
+        else:
+            database_path = database_location_override
 
         self.__comunio_session = comunio_session
         self.__database = sqlite3.connect(database_path)

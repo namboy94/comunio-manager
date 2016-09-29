@@ -113,6 +113,7 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
             current_value = "{:,}€".format(current_value)
             total_player_delta = "{:,}€".format(total_player_delta)
 
+            # TODO Colour the items according to their values
             self.player_table.addTopLevelItem(QTreeWidgetItem([position,
                                                                name,
                                                                points,
