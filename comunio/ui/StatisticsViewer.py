@@ -145,7 +145,17 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
         :param player: The name of the player whose graph should be generated
         :return:       None
         """
-        historic_data = self.__database_manager.get_historic_values_for_player(player)
+        historic_data = self.__database_manager.get_historic_data_for_player(player)
+        # TODO Fill the graph
+
+    def fill_player_points_graph(self, player: str) -> None:
+        """
+        Fills the points graph of the currently selected player
+
+        :param player: the name of the player whose graph should be filled
+        :return: None
+        """
+        historic_data = self.__database_manager.get_historic_data_for_player(player)
         # TODO Fill the graph
 
 
