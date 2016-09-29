@@ -139,9 +139,19 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
         self.player_position_label.setText(player["position"])
         self.player_points_label.setText(str(player["points"]))
         self.player_value_label.setText("{:,}".format(player["value"]))
+        self.fill_player_value_graph(player["name"])
 
-        historic_data = self.__database_manager.get_historic_values_for_player(player["name"])
+    def fill_player_value_graph(self, player: str) -> None:
+        """
+        Fills the player value graph widget with a graph displaying the player's previous values
+        over time
+
+        :param player: The name of the player whose graph should be generated
+        :return:       None
+        """
+        historic_data = self.__database_manager.get_historic_values_for_player(player)
         # TODO Fill the graph
+
 
 def start(comunio_session: ComunioSession or None, database_manager: DatabaseManager) -> None:
     """
