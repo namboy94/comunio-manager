@@ -198,7 +198,11 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
             self.__pyplot_figure.clear()
 
             pixmap = QPixmap(image_path)
-            self.value_graph.setPixmap(pixmap)
+
+            if graph == "value":
+                self.value_graph.setPixmap(pixmap)
+            else:
+                self.points_graph.setPixmap(pixmap)
 
             os.remove(image_path)
 
