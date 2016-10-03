@@ -1,6 +1,6 @@
 """
 LICENSE:
-Copyright 2014 Javier Corbín (MIT License), 2016 Hermann Krumrey
+Copyright 2016 Hermann Krumrey
 
 This file is part of comunio-manager.
 
