@@ -232,8 +232,8 @@ class DatabaseManager(object):
             self.__update_players_table()
             self.__update_manager_stats_table()
             self.__update_transfers_from_news()
-            self.__update_transfers_from_missing_player()
-            self.__update_transfers_from_unregistered_player()
+            #self.__update_transfers_from_missing_player()
+            #self.__update_transfers_from_unregistered_player()
 
     def get_players_on_day(self, day: int = 0) -> List[Dict[str, str or int]]:
         """
