@@ -224,7 +224,6 @@ class ComunioSession:
             if article["type"] == "Transfers" and article["date"] == date:
 
                 transfer_text = article["content"]
-                print(repr(transfer_text))
 
                 while True:
                     player_name, transfer_text = transfer_text.split(" wechselt für ", 1)

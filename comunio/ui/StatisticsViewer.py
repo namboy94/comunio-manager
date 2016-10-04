@@ -175,23 +175,29 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
         for graph in ["value", "points"]:
 
             x_values = []
-            y_values = []
+            y_values = [] if graph == "points" else [self.__database_manager.get_player_buy_value(player)]
 
+            smallest_date = datetime.datetime.utcnow()
             i = len(historic_data) - 1
             while i > -1:
                 data_point = historic_data[i]
-                x_values.append(datetime.datetime.strptime(data_point[1], "%Y-%m-%d").date())
+                data_date = datetime.datetime.strptime(data_point[1], "%Y-%m-%d")
+
+                x_values.append(data_date.date())
                 y_values.append(data_point[0][graph])
+
+                if graph == "value":
+                    smallest_date = smallest_date if smallest_date < data_date else data_date
+
                 i -= 1
+
+            if graph == "value":
+                x_values = [(smallest_date - datetime.timedelta(days=1)).date()] + x_values
 
             pyplot.gca().xaxis.set_major_formatter(dates.DateFormatter("%Y-%m-%d"))
             pyplot.gca().xaxis.set_major_locator(dates.DayLocator())
             pyplot.plot(x_values, y_values, "-o")
             pyplot.gcf().autofmt_xdate()
-
-            y_min_padder = 0 if graph == "value" else -2
-            y_max_padder = 1000000 if graph == "value" else 2
-            pyplot.axis([x_values[0], x_values[len(x_values) - 1], y_min_padder, max(y_values) + y_max_padder])
 
             image_path = os.path.join(os.path.expanduser("~"), ".comunio", "temp.png")
             self.__pyplot_figure.savefig(image_path, dpi=self.__pyplot_figure.dpi/2)

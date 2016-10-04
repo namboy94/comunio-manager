@@ -114,9 +114,13 @@ class DatabaseManager(object):
         """
         Updates the 'players' table
 
+        :raises
         :return: None
         """
         players = self.__comunio_session.get_own_player_list()
+
+        if len(players) == 5:
+            raise ReferenceError("Player List Unavailable")
 
         sql = "INSERT INTO players (name, value, points, position, date) VALUES(?, ?, ?, ?, ?)"
         for player in players:
@@ -148,10 +152,10 @@ class DatabaseManager(object):
         for transfer in transfers:
             if transfer["type"] == "bought":
                 self.__database.execute("INSERT INTO player_info (name, buy_value, sell_value) VALUES(?, ?, NULL)",
-                                        (transfer["name"], transfer["value"]))
+                                        (transfer["name"], transfer["amount"]))
             else:
                 self.__database.execute("UPDATE player_info SET sell_value = ? WHERE name = ?",
-                                        (transfer["value"], transfer["name"]))
+                                        (transfer["amount"], transfer["name"]))
         self.__database.commit()
 
     def __update_transfers_from_unregistered_player(self) -> None:
@@ -165,10 +169,10 @@ class DatabaseManager(object):
         :return: None
         """
 
-        player_infos = self.__database.execute("SELECT name FROM player_info WHERE sell_value = NULL").fetchall()
+        player_infos = self.__database.execute("SELECT name FROM player_info WHERE sell_value IS NULL").fetchall()
 
         for player in self.get_players_on_day(0):
-            if player["name"] not in player_infos:
+            if (player["name"],) not in player_infos:
                 self.__database.execute("INSERT INTO player_info (name, buy_value, sell_value) VALUES(?, ?, NULL)",
                                         (player["name"], player["value"]))
         self.__database.commit()
@@ -184,13 +188,13 @@ class DatabaseManager(object):
 
         :return: None
         """
-        player_infos = self.__database.execute("SELECT name FROM player_info WHERE sell_value = NULL").fetchall()
+        player_infos = self.__database.execute("SELECT name FROM player_info WHERE sell_value IS NULL").fetchall()
 
         for player in player_infos:
 
             is_still_in_team = False
             for today_player in self.get_players_on_day(0):
-                if today_player["name"] == player:
+                if today_player["name"] == player[0]:
                     is_still_in_team = True
                     break
 
@@ -209,10 +213,10 @@ class DatabaseManager(object):
 
                     if day_counter < 15:
                         market_value = self.__database.execute("SELECT buy_value FROM player_info WHERE name = ?",
-                                                               (player,)).fetchall()[0]
+                                                               (player[0],)).fetchall()[0]
 
                 self.__database.execute("UPDATE player_info SET sell_value = ? WHERE name = ?",
-                                        (market_value, player))
+                                        (market_value[0], player[0]))
 
         self.__database.commit()
 

@@ -1,6 +1,6 @@
 """
 LICENSE:
-Copyright 2014 Javier Corbín (MIT License), 2016 Hermann Krumrey
+Copyright 2016 Hermann Krumrey
 
 This file is part of comunio-manager.
 
@@ -41,7 +41,7 @@ project_description = "A Comunio Desktop Application"
 A short description of the project
 """
 
-version_number = "0.1.0"
+version_number = "0.2.0"
 """
 The current version of the program.
 """
@@ -77,7 +77,7 @@ license_type = "GNU GPL3"
 The project's license type
 """
 
-dependencies = ["raven", "requests", "bs4", "matplotlib"]
+dependencies = ["raven", "requests", "bs4", "matplotlib", "PyQt5"]
 """
 Python Packaging Index requirements
 """
