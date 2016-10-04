@@ -58,7 +58,7 @@ generate_documentation:
     - make html
     - make latexpdf
     - rsync -av build/html/ www.krumreyh.com@ssh.strato.de:~/programming_pages/comunio/documentation/html --delete-after
-    - rsync -av build/latex/comunio.pdf www.krumreyh.com@ssh.strato.de:~/programming_pages/comunio/documentation/documentation.pdf --delete-after
+    - rsync -av build/latex/ComunioManager.pdf www.krumreyh.com@ssh.strato.de:~/programming_pages/comunio/documentation/documentation.pdf --delete-after
   artifacts:
     paths:
       - doc/build/html
