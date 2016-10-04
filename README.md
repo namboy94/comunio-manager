@@ -32,9 +32,9 @@ This will run the program, updating the database while doing so and exit.
 
 ### Options
 
-   -g , --gui           Starts the program's GUI mode
-   -u , --update        Updates the local database, then exits the program
-   -l , --list          Prints a short summary of the player's account to the console
+    -g , --gui           Starts the program's GUI mode
+    -u , --update        Updates the local database, then exits the program
+    -l , --list          Prints a short summary of the player's account to the console
    
 
 ## Further Information
