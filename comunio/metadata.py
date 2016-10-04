@@ -77,9 +77,14 @@ license_type = "GNU GPL3"
 The project's license type
 """
 
-dependencies = ["raven", "requests", "bs4", "matplotlib", "PyQt5"]
+dependencies = ["raven", "requests", "bs4", "matplotlib"]
 """
 Python Packaging Index requirements
+"""
+
+optional_dependencies = {"gui": ["PyQt5"]}
+"""
+Optional dependencies
 """
 
 audience = "Intended Audience :: Developers"
