@@ -41,7 +41,7 @@ project_description = "A Comunio Desktop Application"
 A short description of the project
 """
 
-version_number = "0.2.0"
+version_number = "0.2.1"
 """
 The current version of the program.
 """
@@ -77,9 +77,14 @@ license_type = "GNU GPL3"
 The project's license type
 """
 
-dependencies = ["raven", "requests", "bs4", "matplotlib", "PyQt5"]
+dependencies = ["raven", "requests", "bs4", "matplotlib"]
 """
 Python Packaging Index requirements
+"""
+
+optional_dependencies = {"gui": ["PyQt5"]}
+"""
+Optional dependencies
 """
 
 audience = "Intended Audience :: Developers"
