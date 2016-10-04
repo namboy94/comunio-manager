@@ -171,7 +171,6 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
         :return:       None
         """
         historic_data = self.__database_manager.get_historic_data_for_player(player)
-        print(historic_data)
 
         for graph in ["value", "points"]:
 
@@ -194,9 +193,6 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
 
             if graph == "value":
                 x_values = [(smallest_date - datetime.timedelta(days=1)).date()] + x_values
-
-            print(x_values)
-            print(y_values)
 
             pyplot.gca().xaxis.set_major_formatter(dates.DateFormatter("%Y-%m-%d"))
             pyplot.gca().xaxis.set_major_locator(dates.DayLocator())

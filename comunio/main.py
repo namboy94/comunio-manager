@@ -23,6 +23,7 @@ LICENSE
 """
 
 # imports
+import sys
 import argparse
 from comunio.ui.StatisticsViewer import start as start_gui
 from comunio.scraper.ComunioSession import ComunioSession
@@ -44,9 +45,15 @@ def main() -> None:
     parser.add_argument("-s", "--summary", action="store_true", help="Lists the current state of the comunio account")
     args = parser.parse_args()
 
-    comunio = ComunioSession(args.username, args.password)
-    database = DatabaseManager(comunio)
-    calculator = StatisticsCalculator(comunio, database)
+    try:
+        comunio = ComunioSession(args.username, args.password)
+        database = DatabaseManager(comunio)
+        calculator = StatisticsCalculator(comunio, database)
+    except ReferenceError:
+        print("Player data unavailable due to having 5 players on the transfer list.")
+        print("Please Remove a player from the transfer list to continue.")
+        print("The program will now exit")
+        sys.exit(1)
 
     if args.gui:
         start_gui(comunio, database)
