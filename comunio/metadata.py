@@ -41,7 +41,7 @@ project_description = "A Comunio Desktop Application"
 A short description of the project
 """
 
-version_number = "0.1.0"
+version_number = "0.2.0"
 """
 The current version of the program.
 """
