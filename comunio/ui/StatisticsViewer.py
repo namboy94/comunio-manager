@@ -171,6 +171,7 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
         :return:       None
         """
         historic_data = self.__database_manager.get_historic_data_for_player(player)
+        print(historic_data)
 
         for graph in ["value", "points"]:
 
@@ -194,14 +195,13 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
             if graph == "value":
                 x_values = [(smallest_date - datetime.timedelta(days=1)).date()] + x_values
 
+            print(x_values)
+            print(y_values)
+
             pyplot.gca().xaxis.set_major_formatter(dates.DateFormatter("%Y-%m-%d"))
             pyplot.gca().xaxis.set_major_locator(dates.DayLocator())
             pyplot.plot(x_values, y_values, "-o")
             pyplot.gcf().autofmt_xdate()
-
-            y_min_padder = 0 if graph == "value" else -2
-            y_max_padder = 1000000 if graph == "value" else 2
-            pyplot.axis([x_values[0], x_values[len(x_values) - 1], y_min_padder, max(y_values) + y_max_padder])
 
             image_path = os.path.join(os.path.expanduser("~"), ".comunio", "temp.png")
             self.__pyplot_figure.savefig(image_path, dpi=self.__pyplot_figure.dpi/2)

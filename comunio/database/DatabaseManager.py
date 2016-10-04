@@ -148,10 +148,10 @@ class DatabaseManager(object):
         for transfer in transfers:
             if transfer["type"] == "bought":
                 self.__database.execute("INSERT INTO player_info (name, buy_value, sell_value) VALUES(?, ?, NULL)",
-                                        (transfer["name"], transfer["value"]))
+                                        (transfer["name"], transfer["amount"]))
             else:
                 self.__database.execute("UPDATE player_info SET sell_value = ? WHERE name = ?",
-                                        (transfer["value"], transfer["name"]))
+                                        (transfer["amount"], transfer["name"]))
         self.__database.commit()
 
     def __update_transfers_from_unregistered_player(self) -> None:
