@@ -26,7 +26,7 @@ install_python2_dependencies:
   script:
     - 3to2 . --write
     - python2 setup.py install --user
-    - pip2 uninstall comunio
+    - pip2 uninstall comunio -y
 
 install_python3_dependencies:
   stage: setup
@@ -35,7 +35,7 @@ install_python3_dependencies:
     - develop
   script:
     - python3 setup.py install --user
-    - pip3 uninstall comunio
+    - pip3 uninstall comunio -y
 
 run_unit_tests_python_2:
   stage: test
