@@ -127,7 +127,7 @@ The license used for this project
 try:
     from raven import Client
     sentry = Client(
-        dsn="http://978e4ecaaa6b49e2ac5bba667d2b708d:67fcad2935614f44b02681d1ae12219e@85.214.124.204:9000/4",
+        dsn="http://6a675d23de874b91ae455a7ee4790e8e:9337f78f416e4fdc8888b79b8827f592@sentry.namibsun.net/3",
         release=version_number
     )
 except ImportError:
