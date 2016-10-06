@@ -22,9 +22,10 @@ This file is part of comunio-manager.
 LICENSE
 """
 
-# imports
-from raven import Client
 
+"""
+The Sentry client for logging bugs
+"""
 
 """
 The metadata is stored here. It can be used by any other module in this project this way, most
@@ -122,9 +123,13 @@ license_identifier = "License :: OSI Approved :: GNU General Public License v3 (
 The license used for this project
 """
 
-# Sentry Configuration
-sentry = Client(dsn="http://978e4ecaaa6b49e2ac5bba667d2b708d:67fcad2935614f44b02681d1ae12219e@85.214.124.204:9000/4",
-                release=version_number)
-"""
-The Sentry client for logging bugs
-"""
+# Imports and Sentry Configuration
+try:
+    from raven import Client
+    sentry = Client(
+        dsn="http://978e4ecaaa6b49e2ac5bba667d2b708d:67fcad2935614f44b02681d1ae12219e@85.214.124.204:9000/4",
+        release=version_number
+    )
+except ImportError:
+    Client = None
+    sentry = None
