@@ -1,5 +1,6 @@
 stages:
   - mirror
+  - setup
   - test
   - deploy
   - docstats
@@ -16,6 +17,25 @@ clone_master:
     - git checkout develop
     - git pull origin develop
     - git push -u git@github.com:namboy94/comunio-manager.git develop --force
+
+install_python2_dependencies:
+  stage: setup
+  only:
+    - master
+    - develop
+  script:
+    - 3to2 . --write
+    - python2 setup.py install --user
+    - pip2 uninstall comunio
+
+install_python3_dependencies:
+  stage: setup
+  only:
+    - master
+    - develop
+  script:
+    - python3 setup.py install --user
+    - pip3 uninstall comunio
 
 run_unit_tests_python_2:
   stage: test
@@ -56,7 +76,21 @@ binary_2_dist:
     - 3to2 . --write
     - python2 setup.py bdist_wheel upload
 
-generate_documentation:
+generate_documentation_pdf:
+  stage: docstats
+  only:
+    - master
+    - develop
+  script:
+    - cd doc
+    - make buildsource
+    - make latexpdf
+    - rsync -av build/latex/ComunioManager.pdf /var/www/docs.namibsun.net/public_html/pdf_docs/comunio-manager.pdf --delete-before
+  artifacts:
+    paths:
+      - doc/build/latex/ComunioManager.pdf
+
+generate_documentation_html:
   stage: docstats
   only:
     - master
@@ -65,13 +99,10 @@ generate_documentation:
     - cd doc
     - make buildsource
     - make html
-    - make latexpdf
     - rsync -av build/html/ /var/www/docs.namibsun.net/public_html/html_docs/comunio-manager --delete-before
-    - rsync -av build/latex/ComunioManager.pdf /var/www/docs.namibsun.net/public_html/pdf_docs/comunio-manager.pdf --delete-before
   artifacts:
     paths:
       - doc/build/html
-      - doc/build/latex/ComunioManager.pdf
 
 gitstats:
   stage: docstats
