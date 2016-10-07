@@ -70,26 +70,10 @@ def main() -> None:
         else:
             handle_cli(args, credentials)
 
-
-
-
-
-        if args.gui:
-            start_gui(comunio, database)
-        elif args.list:
-            print("Cash:       {:,}".format(database.get_last_cash_amount()))
-            print("Team value: {:,}".format(database.get_last_team_value_amount()))
-            print("Balance:    {:,}".format(calculator.calculate_total_assets_delta()))
-            print("\n\nPlayers:\n")
-            for player in database.get_players_on_day(0):
-                print(player)
-        elif args.refresh:
-            database.update_database()
-        else:
-            print("No valid flag provided. See comunio --help for more information")
     except Exception as e:
         SentryLogger.sentry.captureException()
         raise e
+
 
 def handle_cli(args: Namespace, credentials: CredentialsManager) -> None:
     """
@@ -114,14 +98,37 @@ def handle_cli(args: Namespace, credentials: CredentialsManager) -> None:
         database = DatabaseManager(comunio)
         calculator = StatisticsCalculator(comunio, database)
 
+        if args.refesh:
+            database.update_database()
+            print("Database Successfully Updates")
+
+        elif args.summary:
+            print("Cash:       {:,}".format(database.get_last_cash_amount()))
+            print("Team value: {:,}".format(database.get_last_team_value_amount()))
+            print("Balance:    {:,}".format(calculator.calculate_total_assets_delta()))
+            print("\n\nPlayers:\n")
+            for player in database.get_players_on_day(0):
+                print(player)
+
+        else:
+            print("No valid options passed. See the --help option for more information")
+
     except ReferenceError:
         print("Player data unavailable due to having 5 players on the transfer list.")
         print("Please Remove a player from the transfer list to continue.")
         print("The program will now exit")
-        sys.exit(1)
+    except ConnectionError:
+        print("Connection to Comunio failed due to Netwoek error")
+    except PermissionError:
+        print("The provided credentials are invalid")
 
-    if not comunio.is_connected():
-        "WARNING: Could not establish connection to comunio"
 
-if __name__ == '__main__':
-    main()
+def handle_gui(args: Namespace, credentials: CredentialsManager) -> None:
+    """
+    Handles the GUI initialization of the program
+
+    :param args:        the previously parsed console arguments
+    :param credentials: the previously defined credential manager
+    :return:            None
+    """
+    

@@ -226,9 +226,6 @@ class DatabaseManager(object):
 
         :return: None
         """
-        if not self.__comunio_session.is_connected():
-            return
-
         today_results = self.__database.execute("SELECT * FROM players WHERE date = ?", (self.__date,)).fetchall()
 
         if len(today_results) == 0:  # Check if today's data has already been entered
