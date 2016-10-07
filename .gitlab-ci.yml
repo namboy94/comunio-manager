@@ -2,6 +2,7 @@ stages:
   - mirror
   - test
   - deploy
+  - release
   - docstats
 
 variables:
@@ -64,6 +65,24 @@ binary_2_dist:
     - 3to2 . --write
     - python2 setup.py bdist_wheel
     - twine upload dist/*
+
+upload_release_to_github:
+  stage: release
+  only:
+    - master
+  tags:
+    - python
+  script:
+    - python3 builder.py github-release
+
+upload_release_to_gitlab:
+  stage: release
+  only:
+    - master
+  tags:
+    - python
+  script:
+    - python3 builder.py gitlab-release
 
 generate_documentation_pdf:
   stage: docstats
