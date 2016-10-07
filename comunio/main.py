@@ -26,7 +26,7 @@ LICENSE
 import sys
 import argparse
 from argparse import Namespace
-from comunio.metadata import sentry
+from comunio.metadata import SentryLogger
 from comunio.ui.StatisticsViewer import start as start_gui
 from comunio.scraper.ComunioSession import ComunioSession
 from comunio.database.DatabaseManager import DatabaseManager
@@ -83,8 +83,8 @@ def main() -> None:
         else:
             print("No valid flag provided. See comunio --help for more information")
     except Exception as e:
-        str(e)
-        sentry.captureException()
+        SentryLogger.sentry.captureException()
+        raise e
 
 if __name__ == '__main__':
     main()
