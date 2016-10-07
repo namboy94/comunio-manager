@@ -13,10 +13,10 @@ clone_master:
   script:
     - git checkout master
     - git pull origin master
-    - git push -u git@github.com:namboy94/comunio-manager.git master --force
+    - git push git@github.com:namboy94/comunio-manager.git master --force
     - git checkout develop
     - git pull origin develop
-    - git push -u git@github.com:namboy94/comunio-manager.git develop --force
+    - git push git@github.com:namboy94/comunio-manager.git develop --force
 
 install_python2_dependencies:
   stage: setup
