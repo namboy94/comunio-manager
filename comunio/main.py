@@ -25,10 +25,28 @@ LICENSE
 # imports
 import sys
 import argparse
+from argparse import Namespace
+from comunio.metadata import SentryLogger
 from comunio.ui.StatisticsViewer import start as start_gui
 from comunio.scraper.ComunioSession import ComunioSession
 from comunio.database.DatabaseManager import DatabaseManager
 from comunio.calc.StatisticsCalculator import StatisticsCalculator
+
+
+def parse_arguments() -> Namespace:
+    """
+    Parses the command line aruments
+
+    :return: the arguments as an argsparse namespace
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument("username", help="The username with which to log in to comunio.de")
+    parser.add_argument("password", help="The password with which to log in to comunio.de")
+    parser.add_argument("-g", "--gui", action="store_true", help="Starts the program in GUI mode")
+    parser.add_argument("-u", "--update", action="store_true", help="Only updates the database, then quits")
+    parser.add_argument("-l", "--list", action="store_true", help="Prints the current state of the comunio team")
+    parser.add_argument("-s", "--summary", action="store_true", help="Lists the current state of the comunio account")
+    return parser.parse_args()
 
 
 def main() -> None:
@@ -37,35 +55,36 @@ def main() -> None:
 
     :return: None
     """
-    parser = argparse.ArgumentParser()
-    parser.add_argument("username",  help="The username with which to log in to comunio.de")
-    parser.add_argument("password", help="The password with which to log in to comunio.de")
-    parser.add_argument("-g", "--gui", action="store_true", help="Starts the program in GUI mode")
-    parser.add_argument("-u", "--update", action="store_true", help="Only updates the database, then quits")
-    parser.add_argument("-s", "--summary", action="store_true", help="Lists the current state of the comunio account")
-    args = parser.parse_args()
-
     try:
-        comunio = ComunioSession(args.username, args.password)
-        database = DatabaseManager(comunio)
-        calculator = StatisticsCalculator(comunio, database)
-    except ReferenceError:
-        print("Player data unavailable due to having 5 players on the transfer list.")
-        print("Please Remove a player from the transfer list to continue.")
-        print("The program will now exit")
-        sys.exit(1)
 
-    if args.gui:
-        start_gui(comunio, database)
-    elif args.list:
-        print("Cash:       {:,}".format(database.get_last_cash_amount()))
-        print("Team value: {:,}".format(database.get_last_team_value_amount()))
-        print("Balance:    {:,}".format(calculator.calculate_total_assets_delta()))
-        print("\n\nPlayers:\n")
-        for player in database.get_players_on_day(0):
-            print(player)
-    elif args.update:
-        database.update_database()
+        args = parse_arguments()
+
+        try:
+            comunio = ComunioSession(args.username, args.password)
+            database = DatabaseManager(comunio)
+            calculator = StatisticsCalculator(comunio, database)
+        except ReferenceError:
+            print("Player data unavailable due to having 5 players on the transfer list.")
+            print("Please Remove a player from the transfer list to continue.")
+            print("The program will now exit")
+            sys.exit(1)
+
+        if args.gui:
+            start_gui(comunio, database)
+        elif args.list:
+            print("Cash:       {:,}".format(database.get_last_cash_amount()))
+            print("Team value: {:,}".format(database.get_last_team_value_amount()))
+            print("Balance:    {:,}".format(calculator.calculate_total_assets_delta()))
+            print("\n\nPlayers:\n")
+            for player in database.get_players_on_day(0):
+                print(player)
+        elif args.update:
+            database.update_database()
+        else:
+            print("No valid flag provided. See comunio --help for more information")
+    except Exception as e:
+        SentryLogger.sentry.captureException()
+        raise e
 
 if __name__ == '__main__':
     main()

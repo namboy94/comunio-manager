@@ -32,19 +32,21 @@ This will run the program, updating the database while doing so and exit.
 
 ### Options
 
-   -g , --gui           Starts the program's GUI mode
-   -u , --update        Updates the local database, then exits the program
-   -l , --list          Prints a short summary of the player's account to the console
+    -g , --gui           Starts the program's GUI mode
+    -u , --update        Updates the local database, then exits the program
+    -l , --list          Prints a short summary of the player's account to the console
    
 
 ## Further Information
 
-[Documentation(HTML)]()
+[Documentation(HTML)](https://docs.namibsun.net/html_docs/comunio-manager/index.html)
 
-[Documentation(PDF)]()
+[Documentation(PDF)](https://docs.namibsun.net/pdf_docs/comunio-manager.pdf)
 
-[Python Package Index Site]()
+[Python Package Index Site](https://pypi.python.org/pypi/comunio)
 
-[Git Statistics]()
+[Git Statistics (gitstats)](https://gitstats.namibsun.net/gitstats/comunio-manager/index.html)
 
-[Changelog]()
+[Git Statistics (git_stats)](https://gitstats.namibsun.net/git_stats/comunio-manager/index.html)
+
+[Changelog](https://gitlab.namibsun.net/namboy94/comunio-manager/raw/master/CHANGELOG)
