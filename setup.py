@@ -2,30 +2,30 @@
 LICENSE:
 Copyright 2016 Hermann Krumrey
 
-This file is part of comunio-manager.
+This file is part of gitlab-build-scripts.
 
-    comunio-manager is a program that allows a user to track his/her comunio.de
-    profile
+    gitlab-build-scripts is a collection of scripts, importable via pip/setuptools,
+    that act as helpers for gitlab CI builds.
 
-    comunio-manager is free software: you can redistribute it and/or modify
+    gitlab-build-scripts is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    comunio-manager is distributed in the hope that it will be useful,
+    gitlab-build-scripts is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with comunio-manager.  If not, see <http://www.gnu.org/licenses/>.
+    along with gitlab-build-scripts.  If not, see <http://www.gnu.org/licenses/>.
 LICENSE
 """
 
 # imports
 import os
 from setuptools import setup, find_packages
-import comunio.metadata as metadata
+from comunio.metadata import PypiVariables
 
 
 def readme():
@@ -54,34 +54,28 @@ def find_scripts():
 
     :return: the list of scripts
     """
-    scripts = []
-    for file_name in os.listdir("bin"):
-        if not file_name == "__init__.py" and os.path.isfile(os.path.join("bin", file_name)):
-            scripts.append(os.path.join("bin", file_name))
-    return scripts
+    try:
+        scripts = []
+        for file_name in os.listdir("bin"):
+            if not file_name == "__init__.py" and os.path.isfile(os.path.join("bin", file_name)):
+                scripts.append(os.path.join("bin", file_name))
+        return scripts
+    except OSError:
+        return []
 
-setup(name=metadata.project_name,
-      version=metadata.version_number,
-      description=metadata.project_description,
+setup(name=PypiVariables.name,
+      version=PypiVariables.version,
+      description=PypiVariables.description,
       long_description=readme(),
-      classifiers=[metadata.development_status,
-                   metadata.audience,
-                   metadata.license_identifier,
-                   metadata.topic,
-                   metadata.language,
-                   metadata.compatible_os,
-                   metadata.environment,
-                   metadata.programming_language
-                   ],
-      url=metadata.project_url,
-      download_url=metadata.download_url,
-      author=metadata.author_name,
-      author_email=metadata.author_email,
-      license=metadata.license_type,
+      classifiers=PypiVariables.classifiers,
+      url=PypiVariables.url,
+      download_url=PypiVariables.download_url,
+      author=PypiVariables.author,
+      author_email=PypiVariables.author_email,
+      license=PypiVariables.license,
       packages=find_packages(),
-      install_requires=metadata.dependencies,
-      extras_require=metadata.optional_dependencies,
-      dependency_links=[],
+      install_requires=PypiVariables.install_requires,
+      extras_require=PypiVariables.extras_require,
       test_suite='nose.collector',
       tests_require=['nose'],
       scripts=find_scripts(),
