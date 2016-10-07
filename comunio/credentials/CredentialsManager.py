@@ -70,6 +70,12 @@ class CredentialsManager(object):
         """
         return self.username, self.password
 
+    def get_config_file_location(self) -> str:
+        """
+        :return: the config file's location
+        """
+        return self.config_file_location
+
     def set_credentials(self, credentials: Tuple[str, str]) -> None:
         """
         Sets the credentials of the CredentialsManager
