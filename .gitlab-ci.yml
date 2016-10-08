@@ -2,6 +2,7 @@ stages:
   - mirror
   - test
   - build
+  - build_test
   - deploy
   - release
   - docstats
@@ -54,6 +55,17 @@ pyinstaller_linux:
   artifacts:
     paths:
       - comunio/dist/main
+
+pyinstaller_tester:
+  stage: build_test
+  only:
+    - master
+    - binary_dist # ##########################################################################################
+  tags:
+    - linux
+    - python
+  script:
+    - tree
 
 source_dist:
   stage: deploy
