@@ -24,17 +24,19 @@ LICENSE
 
 
 # imports
+import datetime
 import os
 import sys
-import datetime
-from PyQt5.QtGui import QPixmap, QBrush, QColor
+
 import matplotlib.dates as dates
 import matplotlib.pyplot as pyplot
-from comunio.ui.stats import Ui_StatisticsWindow
+from PyQt5.QtGui import QPixmap, QBrush, QColor
+from PyQt5.QtWidgets import QMainWindow, QApplication, QHeaderView, QTreeWidgetItem
+
+from comunio.ui.windows.stats import Ui_StatisticsWindow
 from comunio.scraper.ComunioSession import ComunioSession
 from comunio.database.DatabaseManager import DatabaseManager
 from comunio.calc.StatisticsCalculator import StatisticsCalculator
-from PyQt5.QtWidgets import QMainWindow, QApplication, QHeaderView, QTreeWidgetItem
 
 
 class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):

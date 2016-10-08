@@ -25,12 +25,15 @@ LICENSE
 # imports
 import sys
 import argparse
+from typing import Dict
 from argparse import Namespace
 from comunio.metadata import SentryLogger
+from comunio.ui.LoginScreen import start as start_logi_gui
 from comunio.ui.StatisticsViewer import start as start_gui
 from comunio.scraper.ComunioSession import ComunioSession
 from comunio.database.DatabaseManager import DatabaseManager
 from comunio.calc.StatisticsCalculator import StatisticsCalculator
+from comunio.credentials.CredentialsManager import CredentialsManager
 
 
 def parse_arguments() -> Namespace:
@@ -40,11 +43,11 @@ def parse_arguments() -> Namespace:
     :return: the arguments as an argsparse namespace
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("username", help="The username with which to log in to comunio.de")
-    parser.add_argument("password", help="The password with which to log in to comunio.de")
     parser.add_argument("-g", "--gui", action="store_true", help="Starts the program in GUI mode")
-    parser.add_argument("-u", "--update", action="store_true", help="Only updates the database, then quits")
-    parser.add_argument("-l", "--list", action="store_true", help="Prints the current state of the comunio team")
+    parser.add_argument("-u", "--username", help="The username with which to log in to comunio.de")
+    parser.add_argument("-p", "--password", help="The password with which to log in to comunio.de")
+    parser.add_argument("-k", "--keep_creds", help="Stores the given credentials in a local config file")
+    parser.add_argument("-r", "--refresh", action="store_true", help="Only updates the database, then quits")
     parser.add_argument("-s", "--summary", action="store_true", help="Lists the current state of the comunio account")
     return parser.parse_args()
 
@@ -59,32 +62,81 @@ def main() -> None:
 
         args = parse_arguments()
 
-        try:
-            comunio = ComunioSession(args.username, args.password)
-            database = DatabaseManager(comunio)
-            calculator = StatisticsCalculator(comunio, database)
-        except ReferenceError:
-            print("Player data unavailable due to having 5 players on the transfer list.")
-            print("Please Remove a player from the transfer list to continue.")
-            print("The program will now exit")
-            sys.exit(1)
+        if args.username and args.password:
+            credentials = CredentialsManager((args.username, args.password))
+        else:
+            credentials = CredentialsManager()
 
         if args.gui:
-            start_gui(comunio, database)
-        elif args.list:
+            handle_gui(credentials)
+        else:
+            handle_cli(vars(args), credentials)
+
+    except Exception as e:
+        SentryLogger.sentry.captureException()
+        raise e
+
+
+def handle_cli(args: Dict[str, object], credentials: CredentialsManager) -> None:
+    """
+    Handles the behavious of the CLI of the program
+
+    :param args:        the previously parsed console arguments
+    :param credentials: the previously defined credential manager
+    :return:            None
+    """
+    if credentials.get_credentials() == ("", ""):
+        print("Please supply a username and password:\n")
+        print("    Either via the --password and the --username parameters")
+        print("        OR")
+        print("    The config file found in " + credentials.get_config_file_location())
+        sys.exit(1)
+
+    if not args["refresh"] and not args["summary"]:
+        print("No valid options passed. See the --help option for more information")
+        sys.exit(1)
+
+    if args["keep_creds"]:
+        credentials.store_credentials()
+
+    try:
+        comunio = ComunioSession(credentials.get_credentials()[0], credentials.get_credentials()[1])
+        database = DatabaseManager(comunio)
+        calculator = StatisticsCalculator(comunio, database)
+
+        if args["refresh"]:
+            database.update_database()
+            print("Database Successfully Updated")
+
+        elif args["summary"]:
             print("Cash:       {:,}".format(database.get_last_cash_amount()))
             print("Team value: {:,}".format(database.get_last_team_value_amount()))
             print("Balance:    {:,}".format(calculator.calculate_total_assets_delta()))
             print("\n\nPlayers:\n")
             for player in database.get_players_on_day(0):
                 print(player)
-        elif args.update:
-            database.update_database()
-        else:
-            print("No valid flag provided. See comunio --help for more information")
-    except Exception as e:
-        SentryLogger.sentry.captureException()
-        raise e
 
-if __name__ == '__main__':
-    main()
+        else:
+            print("No valid options passed. See the --help option for more information")
+
+    except ReferenceError:
+        print("Player data unavailable due to having 5 players on the transfer list.")
+        print("Please Remove a player from the transfer list to continue.")
+        print("The program will now exit")
+    except ConnectionError:
+        print("Connection to Comunio failed due to Netwoek error")
+    except PermissionError:
+        print("The provided credentials are invalid")
+
+
+def handle_gui(credentials: CredentialsManager) -> None:
+    """
+    Handles the GUI initialization of the program
+
+    :param credentials: the previously defined credential manager
+    :return:            None
+    """
+    comunio = start_logi_gui(credentials)
+    if comunio is not None:
+        database = DatabaseManager(comunio)
+        start_gui(comunio, database)
