@@ -23,6 +23,7 @@ LICENSE
 """
 
 # imports
+import time
 import requests
 from bs4 import BeautifulSoup
 from comunio.scraper.ComunioFetcher import ComunioFetcher
@@ -82,7 +83,15 @@ class ComunioSession:
 
         try:
             self.__session.post("http://www.comunio.de/login.phtml", data=payload)
-            self.reload_info()
+
+            data_fetched = False
+            while not data_fetched:
+                try:
+                    self.reload_info()
+                    data_fetched = True
+                except ValueError:
+                    time.sleep(1)
+
         except requests.ConnectionError:
             raise ConnectionError("Network Error")
   
