@@ -44,13 +44,14 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
     Class that models the QT GUI for displaying Comunio statistics
     """
 
-    def __init__(self, comunio_session: ComunioSession, database_manager: DatabaseManager,
+    def __init__(self, comunio_session: ComunioSession, database_manager: DatabaseManager, xkcd_mode: bool,
                  parent: QMainWindow = None) -> None:
         """
         Sets up the interactive UI elements
 
         :param comunio_session:  An initialized comunio session, or None
         :param database_manager: An initialized Database Manager object
+        :param xkcd_mode:        Displays graphs as XKCD-styled graphs
         :param parent:           The parent window
         """
         super().__init__(parent)
@@ -59,6 +60,7 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
         self.__pyplot_figure = pyplot.figure()
         self.__players = []
 
+        self.__xkcd_mode = xkcd_mode
         self.__comunio_session = comunio_session
         self.__database_manager = database_manager
         self.__statistics_calculator = StatisticsCalculator(comunio_session, database_manager)
@@ -198,6 +200,10 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
 
             pyplot.gca().xaxis.set_major_formatter(dates.DateFormatter("%Y-%m-%d"))
             pyplot.gca().xaxis.set_major_locator(dates.DayLocator())
+
+            if self.__xkcd_mode:
+                pyplot.xkcd()
+
             pyplot.plot(x_values, y_values, "-o")
             pyplot.gcf().autofmt_xdate()
 
@@ -215,15 +221,16 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
             os.remove(image_path)
 
 
-def start(comunio_session: ComunioSession or None, database_manager: DatabaseManager) -> None:
+def start(comunio_session: ComunioSession or None, database_manager: DatabaseManager, xkcd_mode: bool) -> None:
     """
     Starts the Statistics Viewer GUI.
 
     :param comunio_session:  An initialized comunio session, or None
     :param database_manager: An initialized Database Manager object
+    :param xkcd_mode:        Displays the statistics as XKCD-style graphs
     :return:                 None
     """
     app = QApplication(sys.argv)
-    form = StatisticsViewer(comunio_session, database_manager)
+    form = StatisticsViewer(comunio_session, database_manager, xkcd_mode)
     form.show()
     app.exec_()
