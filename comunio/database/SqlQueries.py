@@ -65,23 +65,17 @@ class SqlQueries(object):
 
     # Inserts
     @staticmethod
-    def insert_players_into_players(database: sqlite3, players: List[Dict[str, str]], date: str) -> None:
+    def insert_player_into_players(database: sqlite3, player: Dict[str, str], date: str) -> None:
         """
         Inserts a player into the 'players' table
 
         :param database The database to be used
-        :param players: A list of player dictionaries with the name, value, points and position keys
+        :param player:  A dictionary with the name, value, points and position keys
         :param date:    The date on which this player should be inserted
         :return:        None
         """
         sql = "INSERT INTO players (name, value, points, position, date) VALUES(?, ?, ?, ?, ?)"
-        for player in players:
-            database.execute(sql, (player["name"],
-                                   player["value"],
-                                   player["points"],
-                                   player["position"],
-                                   date))
-        database.commit()
+        database.execute(sql, (player["name"], player["value"], player["points"], player["position"], date))
 
     @staticmethod
     def insert_new_manager_stats_entry(database: sqlite3, date: str, cash: int, team_value: int) -> None:
@@ -96,7 +90,6 @@ class SqlQueries(object):
         """
         sql = "INSERT INTO manager_stats (date, cash, team_value) VALUES(?, ?, ?)"
         database.execute(sql, (date, cash, team_value))
-        database.commit()
 
     @staticmethod
     def insert_player_info(database: sqlite3, name: str, buy_value: int, sell_value: int or None):
@@ -111,7 +104,6 @@ class SqlQueries(object):
 
         database.execute("INSERT INTO player_info (name, buy_value, sell_value) VALUES(?, ?, ?)",
                          (name, buy_value, sell_value))
-        database.commit()
 
     # Updates
     @staticmethod
@@ -130,7 +122,6 @@ class SqlQueries(object):
             database.execute("UPDATE player_info SET buy_value = ? WHERE name = ?", (buy_value, name))
         elif sell_value is not None:
             database.execute("UPDATE player_info SET sell_value = ? WHERE name = ?", (sell_value, name))
-        database.commit()
 
     # Getters
     @staticmethod

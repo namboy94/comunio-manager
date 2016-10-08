@@ -9,6 +9,7 @@ This file is part of comunio-manager.
 
     comunio-manager is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
+    it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
@@ -89,7 +90,8 @@ class DatabaseManager(object):
         :return: None
         """
         players = self.__comunio_session.get_own_player_list()
-        SqlQueries.insert_players_into_players(self.__database, players, self.__date)
+        for player in players:
+            SqlQueries.insert_player_into_players(self.__database, player, self.__date)
 
     def __update_manager_stats_table(self) -> None:
         """
@@ -184,6 +186,7 @@ class DatabaseManager(object):
             self.__update_transfers_from_news()
             self.__update_transfers_from_missing_player()
             self.__update_transfers_from_unregistered_player()
+            self.__database.commit()
 
     def get_players_on_day(self, day: int = 0) -> List[Dict[str, str or int]]:
         """
