@@ -25,6 +25,7 @@ LICENSE
 # imports
 import sys
 import argparse
+from typing import Dict
 from argparse import Namespace
 from comunio.metadata import SentryLogger
 from comunio.ui.LoginScreen import start as start_logi_gui
@@ -69,14 +70,14 @@ def main() -> None:
         if args.gui:
             handle_gui(credentials)
         else:
-            handle_cli(args, credentials)
+            handle_cli(vars(args), credentials)
 
     except Exception as e:
         SentryLogger.sentry.captureException()
         raise e
 
 
-def handle_cli(args: Namespace, credentials: CredentialsManager) -> None:
+def handle_cli(args: Dict[str, object], credentials: CredentialsManager) -> None:
     """
     Handles the behavious of the CLI of the program
 
@@ -85,13 +86,17 @@ def handle_cli(args: Namespace, credentials: CredentialsManager) -> None:
     :return:            None
     """
     if credentials.get_credentials() == ("", ""):
-        print("Please supply a username and password:")
-        print("Either via the --password and the --username parameters")
-        print("OR")
-        print("The config file found in " + credentials.get_config_file_location())
+        print("Please supply a username and password:\n")
+        print("    Either via the --password and the --username parameters")
+        print("        OR")
+        print("    The config file found in " + credentials.get_config_file_location())
         sys.exit(1)
 
-    if args.keep_creds:
+    if not args["refresh"] and not args["summary"]:
+        print("No valid options passed. See the --help option for more information")
+        sys.exit(1)
+
+    if args["keep_creds"]:
         credentials.store_credentials()
 
     try:
@@ -99,11 +104,11 @@ def handle_cli(args: Namespace, credentials: CredentialsManager) -> None:
         database = DatabaseManager(comunio)
         calculator = StatisticsCalculator(comunio, database)
 
-        if args.refesh:
+        if args["refresh"]:
             database.update_database()
-            print("Database Successfully Updates")
+            print("Database Successfully Updated")
 
-        elif args.summary:
+        elif args["summary"]:
             print("Cash:       {:,}".format(database.get_last_cash_amount()))
             print("Team value: {:,}".format(database.get_last_team_value_amount()))
             print("Balance:    {:,}".format(calculator.calculate_total_assets_delta()))

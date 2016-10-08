@@ -118,6 +118,6 @@ def start(credentials: CredentialsManager) -> ComunioSession:
     :return:            a logged in comunio session
     """
 
-    QApplication(sys.argv)
+    app =QApplication(sys.argv)
     form = LoginScreen(credentials)
     return form.get_comunio_session() if form.exec_() else None
