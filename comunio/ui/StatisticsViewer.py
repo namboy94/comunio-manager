@@ -91,10 +91,6 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
 
         :return: None
         """
-        red = QBrush(QColor(239, 41, 41))
-        green = QBrush(QColor(115, 210, 22))
-        yellow = QBrush(QColor(237, 212, 0))
-
         for player in self.__players:
 
             position = player["position"]
@@ -103,33 +99,20 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
             current_value = player["value"]
             buy_value = self.__database_manager.get_player_buy_value(name)
             total_player_delta = current_value - buy_value
-
-            if total_player_delta > 0:
-                total_player_delta_bg = green
-            elif total_player_delta == 0:
-                total_player_delta_bg = yellow
-            else:
-                total_player_delta_bg = red
+            total_player_delta_bg = self.__get_color_formatting(total_player_delta)
 
             yesterday_value = self.__database_manager.get_player_on_day(name, -1)
             try:
                 yesterday_value = yesterday_value["value"]
                 tendency = current_value - yesterday_value
                 yesterday_value = "{:,}".format(yesterday_value)
-
-                if tendency > 0:
-                    tendency_bg = green
-                elif tendency == 0:
-                    tendency_bg = yellow
-                else:
-                    tendency_bg = red
-
+                tendency_bg = self.__get_color_formatting(tendency)
                 tendency = "{:,}€".format(tendency)
 
             except TypeError:
                 yesterday_value = "---"
                 tendency = "---"
-                tendency_bg = yellow
+                tendency_bg = QBrush(QColor(237, 212, 0))
 
             buy_value = "{:,}".format(buy_value)
             current_value = "{:,}€".format(current_value)
@@ -141,6 +124,22 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
 
             tree_widget_item.setBackground(6, total_player_delta_bg)
             tree_widget_item.setBackground(7, tendency_bg)
+
+    @staticmethod
+    def __get_color_formatting(value: int) -> QBrush:
+        """
+        Evaluates a monetary value an defines a color for it. Red for negative numbers, yellow for 0 and
+        green for positive colors
+
+        :param value: the value to be used
+        :return:      the QBrush appropriate for the value
+        """
+        if value > 0:
+            return QBrush(QColor(115, 210, 22))  # Green
+        elif value == 0:
+            return QBrush(QColor(237, 212, 0))   # Yellow
+        else:  # If value < 0
+            return QBrush(QColor(239, 41, 41))   # Red
 
     def __insert_sorted_players_into_players_list(self) -> None:
         """
