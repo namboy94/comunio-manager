@@ -24,7 +24,8 @@ LICENSE
 
 import comunio.metadata as metadata
 from gitlab_build_scripts.project_builders.python import build
+from gitlab_build_scripts.buildmodules.python.PyInstallerLinux import PyInstallerLinux
 
 
 if __name__ == "__main__":
-    build(metadata, None)
+    build(metadata, [PyInstallerLinux])
