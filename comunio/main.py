@@ -155,7 +155,8 @@ def handle_gui(args: Dict[str, object], credentials: CredentialsManager) -> None
     comunio = start_logi_gui(credentials)
     if comunio is not None:
         database = DatabaseManager(comunio)
-        start_gui(comunio, database, bool(args["xkcd"]))
+        calculator = StatisticsCalculator(comunio, database, bool(args["xkcd"]))
+        start_gui(comunio, database, calculator)
 
 
 if __name__ == "__main__":

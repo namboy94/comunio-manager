@@ -158,8 +158,10 @@ class SqlQueries(object):
                             - position
                             - value
                             - points
+                            - date
         """
-        return database.execute("SELECT name, position, value, points FROM players WHERE date = ?", (date,)).fetchall()
+        return database.execute("SELECT name, position, value, points, date "
+                                "FROM players WHERE date = ?", (date,)).fetchall()
 
     @staticmethod
     def get_player_on_date(database: sqlite3, date: str, name: str) -> Tuple[str, str, int, int]:
@@ -175,8 +177,9 @@ class SqlQueries(object):
                             - position
                             - value
                             - points
+                            - date
         """
-        return database.execute("SELECT name, position, value, points FROM players WHERE date = ? AND name = ?",
+        return database.execute("SELECT name, position, value, points, date FROM players WHERE date = ? AND name = ?",
                                 (date, name)).fetchall()[0]
 
     @staticmethod
