@@ -35,7 +35,7 @@ warnings.filterwarnings("ignore", module="matplotlib")
 # imports
 import sys
 import argparse
-from typing import Dict
+from typing import Dict, List
 from argparse import Namespace
 from comunio.metadata import SentryLogger
 from comunio.ui.LoginScreen import start as start_logi_gui
@@ -124,12 +124,13 @@ def handle_cli(args: Dict[str, object], credentials: CredentialsManager) -> None
             print("Database Successfully Updated")
 
         elif args["summary"]:
-            print("Cash:       {:,}".format(database.get_last_cash_amount()))
+            print("\nCash:       {:,}".format(database.get_last_cash_amount()))
             print("Team value: {:,}".format(database.get_last_team_value_amount()))
             print("Balance:    {:,}".format(calculator.calculate_total_assets_delta()))
-            print("\n\nPlayers:\n")
-            for player in database.get_players_on_day(0):
-                print(player)
+            print("\nPlayers:\n")
+
+            players = database.get_players_on_day(0)
+            print_player_list(players)
 
         else:
             print("No valid options passed. See the --help option for more information")
@@ -142,6 +143,37 @@ def handle_cli(args: Dict[str, object], credentials: CredentialsManager) -> None
         print("Connection to Comunio failed due to Network error")
     except PermissionError:
         print("The provided credentials are invalid")
+
+
+def print_player_list(players: List[Dict[str, str]]) -> None:
+    """
+    Prints the player list in a nicely viewable table on the console
+
+    :param players: the list of players
+    :return:        None
+    """
+    players.append({"position": "Position", "name": "Name", "value": "Value", "points": "Points"})  # Header
+
+    position_max_length = max(len(player["position"]) for player in players)
+    name_max_length = max(len(player["name"]) for player in players)
+    value_max_length = max(len(str(player["value"])) for player in players)
+    points_max_length = max(len(str(player["points"])) for player in players)
+
+    sorted_players = []
+    order = ["Position", "Torhüter", "Abwehr", "Mittelfeld", "Sturm"]
+    for position in order:
+        for player in players:
+            if player["position"] == position:
+                player["points_graph"] = None
+                player["value_graph"] = None
+                sorted_players.append(player)
+
+    for player in sorted_players:
+        table_entry = "| " + player["position"].ljust(position_max_length) + " | "
+        table_entry += player["name"].ljust(name_max_length) + " | "
+        table_entry += str(player["value"]).ljust(value_max_length) + " | "
+        table_entry += str(player["points"]).ljust(points_max_length) + " |"
+        print(table_entry)
 
 
 def handle_gui(args: Dict[str, object], credentials: CredentialsManager) -> None:
