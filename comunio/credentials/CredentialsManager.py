@@ -58,7 +58,7 @@ class CredentialsManager(object):
             parser.read(self.config_file_location)
             self.username = parser.get("credentials", "username")
             self.password = parser.get("credentials", "password")
-        except (KeyError, configparser.NoSectionError):
+        except (KeyError, configparser.NoSectionError, FileNotFoundError):
             with open(self.config_file_location, 'w') as config:
                 config.write("[credentials]\nusername=\npassword=\n")
             self.username = ""

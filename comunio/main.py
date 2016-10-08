@@ -28,10 +28,13 @@ import tkinter
 # noinspection PyUnresolvedReferences
 import tkinter.filedialog
 
+# warnings
+import warnings
+warnings.filterwarnings("ignore", module="matplotlib")
+
 # imports
 import sys
 import argparse
-import warnings
 from typing import Dict
 from argparse import Namespace
 from comunio.metadata import SentryLogger
@@ -156,5 +159,4 @@ def handle_gui(credentials: CredentialsManager) -> None:
 
 
 if __name__ == "__main__":
-    warnings.filterwarnings("ignore", module="matplotlib")
     main()
