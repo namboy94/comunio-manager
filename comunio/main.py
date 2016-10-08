@@ -23,8 +23,12 @@ LICENSE
 """
 
 # imports
+# noinspection PyUnresolvedReferences
+import tkinter, tkinter.filedialog  # Needed to be able to include Matplotlib with pyinstaller
+
 import sys
 import argparse
+import warnings
 from typing import Dict
 from argparse import Namespace
 from comunio.metadata import SentryLogger
@@ -146,3 +150,7 @@ def handle_gui(credentials: CredentialsManager) -> None:
     if comunio is not None:
         database = DatabaseManager(comunio)
         start_gui(comunio, database)
+
+
+if __name__ == "__main__":
+    main()

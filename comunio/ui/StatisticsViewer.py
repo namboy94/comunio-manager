@@ -24,15 +24,13 @@ LICENSE
 
 
 # imports
-import datetime
 import os
 import sys
-
+import datetime
 import matplotlib.dates as dates
 import matplotlib.pyplot as pyplot
 from PyQt5.QtGui import QPixmap, QBrush, QColor
 from PyQt5.QtWidgets import QMainWindow, QApplication, QHeaderView, QTreeWidgetItem
-
 from comunio.ui.windows.stats import Ui_StatisticsWindow
 from comunio.scraper.ComunioSession import ComunioSession
 from comunio.database.DatabaseManager import DatabaseManager
