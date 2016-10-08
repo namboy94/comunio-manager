@@ -33,10 +33,10 @@ import matplotlib.pyplot as pyplot
 from PyQt5.QtGui import QPixmap, QBrush, QColor
 from PyQt5.QtWidgets import QMainWindow, QApplication, QHeaderView, QTreeWidgetItem
 
-from comunio.calc.StatisticsCalculator import StatisticsCalculator
-from comunio.database.DatabaseManager import DatabaseManager
-from comunio.scraper.ComunioSession import ComunioSession
 from comunio.ui.windows.stats import Ui_StatisticsWindow
+from comunio.scraper.ComunioSession import ComunioSession
+from comunio.database.DatabaseManager import DatabaseManager
+from comunio.calc.StatisticsCalculator import StatisticsCalculator
 
 
 class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):

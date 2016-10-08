@@ -27,6 +27,7 @@ import sys
 import argparse
 from argparse import Namespace
 from comunio.metadata import SentryLogger
+from comunio.ui.LoginScreen import start as start_logi_gui
 from comunio.ui.StatisticsViewer import start as start_gui
 from comunio.scraper.ComunioSession import ComunioSession
 from comunio.database.DatabaseManager import DatabaseManager
@@ -66,7 +67,7 @@ def main() -> None:
             credentials = CredentialsManager()
 
         if args.gui:
-            handle_gui(args, credentials)
+            handle_gui(credentials)
         else:
             handle_cli(args, credentials)
 
@@ -123,12 +124,14 @@ def handle_cli(args: Namespace, credentials: CredentialsManager) -> None:
         print("The provided credentials are invalid")
 
 
-def handle_gui(args: Namespace, credentials: CredentialsManager) -> None:
+def handle_gui(credentials: CredentialsManager) -> None:
     """
     Handles the GUI initialization of the program
 
-    :param args:        the previously parsed console arguments
     :param credentials: the previously defined credential manager
     :return:            None
     """
-    
+    comunio = start_logi_gui(credentials)
+    if comunio is not None:
+        database = DatabaseManager(comunio)
+        start_gui(comunio, database)
