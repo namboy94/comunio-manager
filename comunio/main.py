@@ -22,6 +22,16 @@ This file is part of comunio-manager.
 LICENSE
 """
 
+# Needed to be able to include Matplotlib with pyinstaller
+# noinspection PyUnresolvedReferences
+import tkinter
+# noinspection PyUnresolvedReferences
+import tkinter.filedialog
+
+# warnings
+import warnings
+warnings.filterwarnings("ignore", module="matplotlib")
+
 # imports
 import sys
 import argparse
@@ -146,3 +156,7 @@ def handle_gui(args: Dict[str, object], credentials: CredentialsManager) -> None
     if comunio is not None:
         database = DatabaseManager(comunio)
         start_gui(comunio, database, bool(args["xkcd"]))
+
+
+if __name__ == "__main__":
+    main()

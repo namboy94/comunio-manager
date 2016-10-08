@@ -1,6 +1,8 @@
 stages:
   - mirror
   - test
+  - build
+  - build_test
   - deploy
   - release
   - docstats
@@ -38,6 +40,20 @@ run_unit_tests_python_3:
     - python
   script:
     - python3 setup.py test
+
+pyinstaller_linux:
+  stage: build
+  only:
+    - master
+  tags:
+    - linux
+    - python
+  script:
+    - cd comunio
+    - python build.py build pyinstaller_linux
+  artifacts:
+    paths:
+      - build/gitlab_build_scripts/*
 
 source_dist:
   stage: deploy
