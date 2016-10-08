@@ -199,6 +199,7 @@ class DatabaseManager(object):
         value:    The player's current value
         points:   The player's currently accumulated performance points
         position: The player's position
+        date:     The associated date as a formatted string
 
         :param day:         The requested day, relative to the current date.
                                 Example: day = -1 returns the list for yesterday
@@ -217,7 +218,8 @@ class DatabaseManager(object):
                 "name": result[0],
                 "position": result[1],
                 "value": result[2],
-                "points": result[3]
+                "points": result[3],
+                "date": result[4]
             }
             players.append(player)
 
@@ -284,12 +286,12 @@ class DatabaseManager(object):
         """
         return SqlQueries.get_last_known_assets_values(self.__database)[1]
 
-    def get_historic_data_for_player(self, player: str) -> List[Tuple[Dict[str, str or int], str]]:
+    def get_historic_data_for_player(self, player: str) -> List[Dict[str, str or int]]:
         """
         Retrieves the data of a player over time as a list of reversely-chronologically sorted values
 
         :param player: The player for which the history should be retrieved
-        :return:       The list of values, reversely chronologically sorted, as a tuple of player dictionary, date
+        :return:       The list of values, reversely chronologically sorted, as dictionaries with player information
         """
         values = []
 
@@ -297,7 +299,7 @@ class DatabaseManager(object):
         while True:
             player_on_day = self.get_player_on_day(player, day)
             if player_on_day is not None:
-                values.append((player_on_day, self.__create_sqlite_date(day)))
+                values.append(player_on_day)
             else:
                 date = self.__create_sqlite_date(day)
                 lowest_date = SqlQueries.get_first_recorded_date_of_player(self.__database, player)
