@@ -43,12 +43,18 @@ def parse_arguments() -> Namespace:
     :return: the arguments as an argsparse namespace
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("-g", "--gui", action="store_true", help="Starts the program in GUI mode")
-    parser.add_argument("-u", "--username", help="The username with which to log in to comunio.de")
-    parser.add_argument("-p", "--password", help="The password with which to log in to comunio.de")
-    parser.add_argument("-k", "--keep_creds", help="Stores the given credentials in a local config file")
-    parser.add_argument("-r", "--refresh", action="store_true", help="Only updates the database, then quits")
-    parser.add_argument("-s", "--summary", action="store_true", help="Lists the current state of the comunio account")
+    parser.add_argument("-g", "--gui", action="store_true",
+                        help="Starts the program in GUI mode")
+    parser.add_argument("-u", "--username",
+                        help="The username with which to log in to comunio.de")
+    parser.add_argument("-p", "--password",
+                        help="The password with which to log in to comunio.de")
+    parser.add_argument("-k", "--keep_creds", action="store_true",
+                        help="Stores the given credentials in a local config file")
+    parser.add_argument("-r", "--refresh", action="store_true",
+                        help="Only updates the database, then quits")
+    parser.add_argument("-s", "--summary", action="store_true",
+                        help="Lists the current state of the comunio account")
     return parser.parse_args()
 
 
