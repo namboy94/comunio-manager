@@ -241,10 +241,10 @@ class DatabaseManager(object):
         try:
             player_info = SqlQueries.get_player_on_date(self.__database, date, name)
             return {
-                "name": name,
-                "value": player_info[0],
+                "name": player_info[0],
                 "position": player_info[1],
-                "points": player_info[2]
+                "value": player_info[2],
+                "points": player_info[3]
             }
         except IndexError:
             return None

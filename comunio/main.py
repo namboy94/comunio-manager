@@ -124,7 +124,7 @@ def handle_cli(args: Dict[str, object], credentials: CredentialsManager) -> None
         print("Please Remove a player from the transfer list to continue.")
         print("The program will now exit")
     except ConnectionError:
-        print("Connection to Comunio failed due to Netwoek error")
+        print("Connection to Comunio failed due to Network error")
     except PermissionError:
         print("The provided credentials are invalid")
 
