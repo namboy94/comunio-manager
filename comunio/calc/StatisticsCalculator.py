@@ -36,7 +36,8 @@ class StatisticsCalculator(object):
     Class that calculates various statistics based on the current comunio data and the local database
     """
 
-    def __init__(self, comunio_session: ComunioSession, database_manager: DatabaseManager, xkcd_mode: bool) -> None:
+    def __init__(self, comunio_session: ComunioSession, database_manager: DatabaseManager, xkcd_mode: bool =False)\
+            -> None:
         """
         Initializes the statistics calculator with a running comunio session and a database manager
         to interface with the local database
@@ -98,11 +99,12 @@ class StatisticsCalculator(object):
         pyplot.plot(x_values, y_values, "-o")
         pyplot.gcf().autofmt_xdate()
 
-        image_path = os.path.join(os.path.expanduser("~"), ".comunio", "images", player + "-" + mode)
+        image_name = (player + "-" + mode).replace(".", "_").replace(" ", "_")
+        image_path = os.path.join(os.path.expanduser("~"), ".comunio", "images", image_name)
 
         if not os.path.isdir(os.path.dirname(image_path)):
             os.makedirs(os.path.dirname(image_path))
 
         self.__pyplot_figure.savefig(image_path, dpi=self.__pyplot_figure.dpi / 2)
         self.__pyplot_figure.clear()
-        return image_path
+        return image_path + ".png"

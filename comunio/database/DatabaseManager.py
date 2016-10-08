@@ -234,6 +234,7 @@ class DatabaseManager(object):
         value:    The player's current value
         points:   The player's currently accumulated performance points
         position: The player's position
+        date:     The date associated with this data point
 
         :param name: the name of the player
         :param day:  the requested day
@@ -246,7 +247,8 @@ class DatabaseManager(object):
                 "name": player_info[0],
                 "position": player_info[1],
                 "value": player_info[2],
-                "points": player_info[3]
+                "points": player_info[3],
+                "date": player_info[4]
             }
         except IndexError:
             return None

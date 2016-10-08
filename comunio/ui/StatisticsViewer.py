@@ -24,8 +24,8 @@ LICENSE
 
 
 # imports
+import os
 import sys
-from threading import Thread
 from PyQt5.QtGui import QPixmap, QBrush, QColor
 from PyQt5.QtWidgets import QMainWindow, QApplication, QHeaderView, QTreeWidgetItem
 from comunio.ui.windows.stats import Ui_StatisticsWindow
@@ -67,7 +67,6 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
 
         self.__fill_initial_data()
         self.__fill_player_table()
-        Thread(target=self.__generate_graphs, args=(self, )).start()
 
     def __fill_initial_data(self) -> None:
         """
@@ -156,8 +155,8 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
         for position in order:
             for player in players:
                 if player["position"] == position:
-                    player["points_graph"] = ""
-                    player["value_graph"] = ""
+                    player["points_graph"] = None
+                    player["value_graph"] = None
                     self.__players.append(player)
 
     def __select_player(self) -> None:
@@ -176,15 +175,6 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
         self.player_value_label.setText("{:,}".format(player["value"]))
         self.fill_graphs(player_index)
 
-    def __generate_graphs(self) -> None:
-
-        for index, player in enumerate(self.__players):
-
-            self.__players[index]["value_graph"] = \
-                self.__statistics_calculator.generate_time_graph(player["name"], "value")
-            self.__players[index]["points_graph"] = \
-                self.__statistics_calculator.generate_time_graph(player["name"], "points")
-
     def fill_graphs(self, player_index: int) -> None:
         """
         Fills the player value graph widget with a graph displaying the player's previous values
@@ -193,14 +183,19 @@ class StatisticsViewer(QMainWindow, Ui_StatisticsWindow):
         :param player_index: The player index in the self.__players attribute
         :return:             None
         """
-        while not self.__players[player_index]["value_graph"] or not self.__players[player_index]["points_graph"]:
-            pass
+        if self.__players[player_index]["value_graph"] is None or self.__players[player_index]["points_graph"] is None:
 
-        value_pixmap = QPixmap(self.__players[player_index]["value_graph"])
-        points_pixmap = QPixmap(self.__players[player_index]["points_graph"])
+            player_name = self.__players[player_index]["name"]
 
-        self.value_graph.setPixmap(value_pixmap)
-        self.points_graph.setPixmap(points_pixmap)
+            value_graph_image = self.__statistics_calculator.generate_time_graph(player_name, "value")
+            points_graph_image = self.__statistics_calculator.generate_time_graph(player_name, "points")
+            self.__players[player_index]["value_graph"] = QPixmap(value_graph_image)
+            self.__players[player_index]["points_graph"] = QPixmap(points_graph_image)
+            os.remove(value_graph_image)
+            os.remove(points_graph_image)
+
+        self.value_graph.setPixmap(self.__players[player_index]["value_graph"])
+        self.points_graph.setPixmap(self.__players[player_index]["points_graph"])
 
 
 def start(comunio_session: ComunioSession, database_manager: DatabaseManager, calculator: StatisticsCalculator) -> None:
