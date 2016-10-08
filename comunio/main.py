@@ -22,10 +22,13 @@ This file is part of comunio-manager.
 LICENSE
 """
 
-# imports
+# Needed to be able to include Matplotlib with pyinstaller
 # noinspection PyUnresolvedReferences
-import tkinter, tkinter.filedialog  # Needed to be able to include Matplotlib with pyinstaller
+import tkinter
+# noinspection PyUnresolvedReferences
+import tkinter.filedialog
 
+# imports
 import sys
 import argparse
 import warnings
@@ -153,4 +156,5 @@ def handle_gui(credentials: CredentialsManager) -> None:
 
 
 if __name__ == "__main__":
+    warnings.filterwarnings("ignore", module="matplotlib")
     main()

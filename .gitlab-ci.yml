@@ -1,6 +1,7 @@
 stages:
   - mirror
   - test
+  - build
   - deploy
   - release
   - docstats
@@ -38,6 +39,21 @@ run_unit_tests_python_3:
     - python
   script:
     - python3 setup.py test
+
+pyinstaller_linux:
+  stage: build
+  only:
+    - master
+    - binary_dist # ##########################################################################################
+  tags:
+    - linux
+    - python
+  script:
+    - cd comunio
+    - pyinstaller --onefile main.py
+  artifacts:
+    paths:
+      - comunio/dist/main
 
 source_dist:
   stage: deploy
