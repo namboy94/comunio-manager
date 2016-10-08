@@ -1,3 +1,9 @@
+V 0.3.0:
+  - Implemented Credentials Storage
+  - Re-worked the CLI parameter calls
+  - Implemented a Login screen for the GUI
+  - ComunioSession now downloads all data at the start, and works offline from then on
+  - Seperated SQL Statements from DataBaseManager
 V 0.2.2:
   - Integrated gitlab_build_scripts tools.
 V 0.2.1:
