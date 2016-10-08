@@ -27,6 +27,7 @@ import os
 import sqlite3
 import datetime
 from typing import Dict, List, Tuple
+from comunio.database.SqlQueries import SqlQueries
 from comunio.scraper.ComunioSession import ComunioSession
 
 
@@ -57,7 +58,8 @@ class DatabaseManager(object):
 
         self.__comunio_session = comunio_session
         self.__database = sqlite3.connect(database_path)
-        self.__apply_schema()
+        SqlQueries.apply_sql_schema(self.__database)
+
         self.update_database()
 
     # noinspection PyMethodMayBeStatic
@@ -79,37 +81,6 @@ class DatabaseManager(object):
 
         return str(date.year).zfill(4) + "-" + str(date.month).zfill(2) + "-" + str(date.day).zfill(2)
 
-    def __apply_schema(self) -> None:
-        """
-        Ensures that the correct schema is present in the connected database file
-
-        :return: None
-        """
-        player_table = "CREATE TABLE IF NOT EXISTS players (" \
-                       "name TEXT NOT NULL," \
-                       "position TEXT NOT NULL," \
-                       "value INTEGER NOT NULL," \
-                       "points INTEGER NOT NULL," \
-                       "date TEXT NOT NULL" \
-                       ");"
-
-        player_info_table = "CREATE TABLE IF NOT EXISTS player_info (" \
-                            "name TEXT NOT NULL," \
-                            "buy_value INTEGER NOT NULL," \
-                            "sell_value INTEGER" \
-                            ");"
-
-        manager_stats_table = "CREATE TABLE IF NOT EXISTS manager_stats (" \
-                              "date TEXT NOT NULL," \
-                              "cash INTEGER NOT NULL," \
-                              "team_value INTEGER NOT NULL" \
-                              ");"
-
-        self.__database.execute(player_table)
-        self.__database.execute(player_info_table)
-        self.__database.execute(manager_stats_table)
-        self.__database.commit()
-
     def __update_players_table(self) -> None:
         """
         Updates the 'players' table
@@ -118,29 +89,17 @@ class DatabaseManager(object):
         :return: None
         """
         players = self.__comunio_session.get_own_player_list()
-
-        if len(players) == 5:
-            raise ReferenceError("Player List Unavailable")
-
-        sql = "INSERT INTO players (name, value, points, position, date) VALUES(?, ?, ?, ?, ?)"
-        for player in players:
-            self.__database.execute(sql, (player["name"],
-                                          player["value"],
-                                          player["points"],
-                                          player["position"],
-                                          self.__date))
-        self.__database.commit()
+        SqlQueries.insert_players_into_players(self.__database, players, self.__date)
 
     def __update_manager_stats_table(self) -> None:
         """
         Updates the 'manager_stats' table
         :return: None
         """
-        sql = "INSERT INTO manager_stats (date, cash, team_value) VALUES(?, ?, ?)"
-        self.__database.execute(sql, (self.__date,
-                                      self.__comunio_session.get_cash(),
-                                      self.__comunio_session.get_team_value()))
-        self.__database.commit()
+        SqlQueries.insert_new_manager_stats_entry(self.__database,
+                                                  self.__date,
+                                                  self.__comunio_session.get_cash(),
+                                                  self.__comunio_session.get_team_value())
 
     def __update_transfers_from_news(self) -> None:
         """
@@ -151,12 +110,9 @@ class DatabaseManager(object):
         transfers = self.__comunio_session.get_today_transfers()
         for transfer in transfers:
             if transfer["type"] == "bought":
-                self.__database.execute("INSERT INTO player_info (name, buy_value, sell_value) VALUES(?, ?, NULL)",
-                                        (transfer["name"], transfer["amount"]))
+                SqlQueries.insert_player_info(self.__database, transfer["name"], transfer["amount"], None)
             else:
-                self.__database.execute("UPDATE player_info SET sell_value = ? WHERE name = ?",
-                                        (transfer["amount"], transfer["name"]))
-        self.__database.commit()
+                SqlQueries.update_player_info(self.__database, transfer["name"], None, transfer["amount"])
 
     def __update_transfers_from_unregistered_player(self) -> None:
         """
@@ -169,13 +125,11 @@ class DatabaseManager(object):
         :return: None
         """
 
-        player_infos = self.__database.execute("SELECT name FROM player_info WHERE sell_value IS NULL").fetchall()
+        player_infos = SqlQueries.get_player_names_with_null_sell_value(self.__database)
 
         for player in self.get_players_on_day(0):
             if (player["name"],) not in player_infos:
-                self.__database.execute("INSERT INTO player_info (name, buy_value, sell_value) VALUES(?, ?, NULL)",
-                                        (player["name"], player["value"]))
-        self.__database.commit()
+                SqlQueries.insert_player_info(self.__database, player["name"], player["value"], None)
 
     def __update_transfers_from_missing_player(self) -> None:
         """
@@ -188,7 +142,7 @@ class DatabaseManager(object):
 
         :return: None
         """
-        player_infos = self.__database.execute("SELECT name FROM player_info WHERE sell_value IS NULL").fetchall()
+        player_infos = SqlQueries.get_player_names_with_null_sell_value(self.__database)
 
         for player in player_infos:
 
@@ -212,13 +166,9 @@ class DatabaseManager(object):
                     day_counter -= 1
 
                     if day_counter < 15:
-                        market_value = self.__database.execute("SELECT buy_value FROM player_info WHERE name = ?",
-                                                               (player[0],)).fetchall()[0]
+                        market_value = SqlQueries.get_buy_value_of_player(self.__database, player[0])
 
-                self.__database.execute("UPDATE player_info SET sell_value = ? WHERE name = ?",
-                                        (market_value[0], player[0]))
-
-        self.__database.commit()
+                SqlQueries.update_player_info(self.__database, player[0], None, market_value[0])
 
     def update_database(self) -> None:
         """
@@ -226,8 +176,7 @@ class DatabaseManager(object):
 
         :return: None
         """
-        today_results = self.__database.execute("SELECT * FROM players WHERE date = ?", (self.__date,)).fetchall()
-
+        today_results = SqlQueries.get_player_list_on_date(self.__database, self.__date)
         if len(today_results) == 0:  # Check if today's data has already been entered
 
             self.__update_players_table()
@@ -257,9 +206,8 @@ class DatabaseManager(object):
             raise ValueError("Day must be 0 or negative")
 
         date = self.__create_sqlite_date(day)
-
         players = []
-        database_results = self.__database.execute("SELECT * FROM players WHERE date = ?", (date, )).fetchall()
+        database_results = SqlQueries.get_player_list_on_date(self.__database, date)
 
         for result in database_results:
             player = {
@@ -283,14 +231,12 @@ class DatabaseManager(object):
         position: The player's position
 
         :param name: the name of the player
-        :param day: the requested day
-        :return: Dictionary containing the player's information, if no entry was found however, return None
+        :param day:  the requested day
+        :return:     Dictionary containing the player's information, if no entry was found however, return None
         """
         date = self.__create_sqlite_date(day)
         try:
-            player_info = self.__database.execute("SELECT value, position, points "
-                                                  "FROM players WHERE name = ? AND date = ?",
-                                                  (name, date)).fetchall()[0]
+            player_info = SqlQueries.get_player_on_date(self.__database, date, name)
             return {
                 "name": name,
                 "value": player_info[0],
@@ -308,7 +254,7 @@ class DatabaseManager(object):
         :return: the player buy values as a dictionary with the player names as key and the values as content
         """
         buy_values = {}
-        players = self.__database.execute("SELECT * FROM player_info WHERE sell_value IS NULL").fetchall()
+        players = SqlQueries.get_player_names_with_null_sell_value(self.__database)
 
         for player in players:
             buy_values[player[0]] = player[1]
@@ -321,19 +267,19 @@ class DatabaseManager(object):
         :param name: the name of the player
         :return: the buy value
         """
-        return self.__database.execute("SELECT buy_value FROM player_info WHERE name = ?", (name, )).fetchall()[0][0]
+        return SqlQueries.get_buy_value_of_player(self.__database, name)
 
     def get_last_cash_amount(self) -> int:
         """
         :return: The last recorded cash amount
         """
-        return self.__database.execute("SELECT cash, MAX(date) FROM manager_stats").fetchall()[0][0]
+        return SqlQueries.get_last_known_assets_values(self.__database)[0]
 
     def get_last_team_value_amount(self) -> int:
         """
         :return: The last recorded team value
         """
-        return self.__database.execute("SELECT team_value, MAX(date) FROM manager_stats").fetchall()[0][0]
+        return SqlQueries.get_last_known_assets_values(self.__database)[1]
 
     def get_historic_data_for_player(self, player: str) -> List[Tuple[Dict[str, str or int], str]]:
         """
@@ -351,7 +297,7 @@ class DatabaseManager(object):
                 values.append((player_on_day, self.__create_sqlite_date(day)))
             else:
                 date = self.__create_sqlite_date(day)
-                lowest_date = self.__database.execute("SELECT MIN(date) FROM players").fetchall()[0][0]
+                lowest_date = SqlQueries.get_first_recorded_date_of_player(self.__database, player)
                 if date < lowest_date:
                     break
 
