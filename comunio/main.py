@@ -196,6 +196,6 @@ def handle_gui(args: Dict[str, object], credentials: CredentialsManager) -> None
 
 
 if __name__ == "__main__":
-    if sys.platform == "windows":  # Automatically start in GUI mode when using windows
+    if sys.platform == "win32":  # Automatically start in GUI mode when using windows
         sys.argv.append("-g")
     main()
