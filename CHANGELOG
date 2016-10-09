@@ -1,3 +1,9 @@
+V 0.4.0:
+  - Graphs are now stored in memory, not re-calculated each time
+  - Console output has been improved
+  - XKCD-style graphs
+  - Missing directory errors fixed
+  - Linux standalone binaries now available
 V 0.3.0:
   - Implemented Credentials Storage
   - Re-worked the CLI parameter calls
