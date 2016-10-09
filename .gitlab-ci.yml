@@ -48,7 +48,6 @@ pyinstaller_linux:
     - linux
     - python
   script:
-    - cd comunio
     - python builder.py build pyinstaller_linux
   artifacts:
     paths:
