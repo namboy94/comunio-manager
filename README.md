@@ -1,4 +1,5 @@
 # Comunio Manager
+![Logo](comunio/resources/logo/logo_256.png)
 
 Comunio Manager is a program designed to help Comunio players with managing their
 teams by collecting information about their player's performance and market value.
