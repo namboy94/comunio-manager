@@ -53,6 +53,19 @@ pyinstaller_linux:
     paths:
       - build/gitlab_build_scripts/*
 
+pyinstaller_linux:
+  stage: build
+  only:
+    - master
+  tags:
+    - windows
+    - python
+  script:
+    - python builder.py build pyinstaller_linux
+  artifacts:
+    paths:
+      - build/gitlab_build_scripts/*
+
 source_dist:
   stage: deploy
   only:
