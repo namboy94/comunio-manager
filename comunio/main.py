@@ -22,18 +22,6 @@ This file is part of comunio-manager.
 LICENSE
 """
 
-# Needed to be able to include Matplotlib with pyinstaller
-# noinspection PyUnresolvedReferences
-import tkinter
-# noinspection PyUnresolvedReferences
-import tkinter.filedialog
-# noinspection PyUnresolvedReferences
-import matplotlib.backends.backend_agg
-
-# warnings
-import warnings
-warnings.filterwarnings("ignore", module="matplotlib")
-
 # imports
 import sys
 import argparse

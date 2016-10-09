@@ -25,8 +25,6 @@ LICENSE
 # imports
 import os
 import datetime
-import matplotlib.dates as dates
-import matplotlib.pyplot as pyplot
 from comunio.scraper.ComunioSession import ComunioSession
 from comunio.database.DatabaseManager import DatabaseManager
 
@@ -48,10 +46,10 @@ class StatisticsCalculator(object):
         """
         self.__comunio_session = comunio_session
         self.__database_manager = database_manager
-        self.__pyplot_figure = pyplot.figure()
+        #self.__pyplot_figure = pyplot.figure()
 
-        if xkcd_mode:
-            pyplot.xkcd()
+        #if xkcd_mode:
+            #pyplot.xkcd()
 
     def calculate_total_assets_delta(self) -> int:
         """
@@ -72,6 +70,22 @@ class StatisticsCalculator(object):
         :param mode:   the type of value on the y-axis, can be 'points' or 'value'
         :return:       the path to the image in which the graph is stored
         """
+
+        # Needed to be able to include Matplotlib with pyinstaller
+        # noinspection PyUnresolvedReferences
+        import tkinter
+        # noinspection PyUnresolvedReferences
+        import tkinter.filedialog
+        # noinspection PyUnresolvedReferences
+        import matplotlib.backends.backend_agg
+
+        # warnings
+        import warnings
+        warnings.filterwarnings("ignore", module="matplotlib")
+
+        import matplotlib.dates as dates
+        import matplotlib.pyplot as pyplot
+
         historic_data = self.__database_manager.get_historic_data_for_player(player)
 
         x_values = []
