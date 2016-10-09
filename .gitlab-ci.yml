@@ -48,7 +48,7 @@ pyinstaller_linux:
     - linux
     - python
   script:
-    - python builder.py build pyinstaller_linux
+    - python3 builder.py build pyinstaller_linux
   artifacts:
     paths:
       - build/gitlab_build_scripts/*
