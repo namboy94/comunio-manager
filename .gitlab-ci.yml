@@ -2,7 +2,6 @@ stages:
   - mirror
   - test
   - build
-  - build_test
   - deploy
   - release
   - docstats
@@ -50,7 +49,7 @@ pyinstaller_linux:
     - python
   script:
     - cd comunio
-    - python build.py build pyinstaller_linux
+    - python builder.py build pyinstaller_linux
   artifacts:
     paths:
       - build/gitlab_build_scripts/*
