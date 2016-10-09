@@ -27,6 +27,8 @@ LICENSE
 import tkinter
 # noinspection PyUnresolvedReferences
 import tkinter.filedialog
+# noinspection PyUnresolvedReferences
+import matplotlib.backends.backend_agg
 
 # warnings
 import warnings
