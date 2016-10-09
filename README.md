@@ -74,13 +74,13 @@ Due to the design of Comunio, the program has a couple of limitations:
 
 ## Screenshots
 
-![The Login Screen]("comunio/resources/screenshots/login.png")
+![The Login Screen](comunio/resources/screenshots/login.png)
 
-![The Main Window]("comunio/resources/screenshots/gui_normal.png")
+![The Main Window](comunio/resources/screenshots/gui_normal.png)
 
-![Using the XKCD graphs]("comunio/resources/screenshots/gui_xkcd.png")
+![Using the XKCD graphs](comunio/resources/screenshots/gui_xkcd.png)
 
-![CLI Summary]("comunio/resources/screenshots/cli.png")
+![CLI Summary](comunio/resources/screenshots/cli.png)
 
 ## Further Information
 
