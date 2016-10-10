@@ -22,13 +22,17 @@ This file is part of comunio-manager.
 LICENSE
 """
 
-# Needed to be able to include Matplotlib with pyinstaller
+# These imports are necessary to get PyInstaller to actually bundle all required modules
+# when creating a binary executable
+
 # noinspection PyUnresolvedReferences
 import tkinter
 # noinspection PyUnresolvedReferences
 import tkinter.filedialog
+# noinspection PyUnresolvedReferences
+import matplotlib.backends.backend_tkagg
 
-# warnings
+# Suppresses Matplotlib warnings
 import warnings
 warnings.filterwarnings("ignore", module="matplotlib")
 
@@ -192,4 +196,6 @@ def handle_gui(args: Dict[str, object], credentials: CredentialsManager) -> None
 
 
 if __name__ == "__main__":
+    if sys.platform == "win32" and len(sys.argv) == 1:  # Automatically start in GUI mode when using windows,
+        sys.argv.append("-g")                           # but only if no arguments were passed
     main()

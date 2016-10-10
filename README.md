@@ -1,7 +1,8 @@
 # Comunio Manager
+![Logo](comunio/resources/logo/logo_256.png)
 
 Comunio Manager is a program designed to help Comunio players with managing their
-teams by collecting information about their player's performance and market value
+teams by collecting information about their player's performance and market value.
 
 This is accomplished by parsing the comunio.de website itself and storing the
 parsed values in a local SQLite3 database.
@@ -18,24 +19,69 @@ If you can not use pip, you can also install the program by downloading the sour
 and running ```python setup.py install``` or ```python setup.py install --user```
 in the root directory (which is the one containing a setup.py file)
 
+Alternatively, Linux and Windows executables which require no additional dependencies
+can be downloaded from the [Github release section](https://github.com/namboy94/comunio-manager/releases)
+
 ## Usage
 
-To use the program, you need to supply it with a username and password as
-positional arguments. Then you can add options to make the program do what you want
-it to.
+The program offers the following command line arguments:
 
-**Example**: username = namboy94, password = hunter2
-
-    comunio namboy94 hunter2
+    -u , --username      Specifies the comunio username
+    -p , --password      Specifies the comunio password
+    -g , --gui           Starts the program in GUI mode
+    -k , --keep_creds    Stores the provided credentials in a local config file
+    -r , --refresh       Updates the local database, then exits the program
+    -s , --summary       Prints a short summary of the player's account to the console
+    -x , --xkcd          Draws the graphs in the GUI in an XKCD-comic style
     
-This will run the program, updating the database while doing so and exit.
+### Examples
 
-### Options
+Running the program with the command
 
-    -g , --gui           Starts the program's GUI mode
-    -u , --update        Updates the local database, then exits the program
-    -l , --list          Prints a short summary of the player's account to the console
-   
+    comunio -u namboy94 -p hunter2 -sk
+    
+will make the program try to log in as the user 'namboy94' and the password
+'hunter2'. Afterwards, a short summary of the player's comunio account will be printed
+to the console. Since the -k flag was also set, the player's username and password
+are stored locally, which enables the player to now just run
+
+    comunio -r
+    
+and the local database will be updated. Please be aware of the fact that anyone 
+with access to your local files will be able to read your credentials, so beware
+of storing these on shared PCs.
+
+The Program also offers a GUI, which can be called via
+
+    comunio -g
+    
+It will start with a login screen, then proceed to displaying various information
+about the comunio account and the (football) players in the (comunio) player's
+team. For more details, view the screenshots section.
+
+Additionally, the -x flag can be combined with the -g flag to show XKCD-style
+graphs instead of normal graphs in the GUI
+
+## Current Limitations
+
+Due to the design of Comunio, the program has a couple of limitations:
+
+  - When 5 players (the maximum amount) are up for sale, the database can not be updated,
+    as it is not possible to determine the market values of the players that are not on sale
+  - At times, the comunio servers do not allow logins from non-'Pro' players. At those times,
+    the program can naturally not update the local database
+  - The program can not get data from the past. Gaps in the database are compensated, but
+    if no daily updates are done, gaps in the data will occur.
+
+## Screenshots
+
+![The Login Screen](comunio/resources/screenshots/login.png)
+
+![The Main Window](comunio/resources/screenshots/gui_normal.png)
+
+![Using the XKCD graphs](comunio/resources/screenshots/gui_xkcd.png)
+
+![CLI Summary](comunio/resources/screenshots/cli.png)
 
 ## Further Information
 
