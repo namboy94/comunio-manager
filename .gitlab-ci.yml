@@ -55,7 +55,7 @@ pyinstaller_linux:
     paths:
       - build/gitlab_build_scripts/*
 
-pyinstaller_linux:
+pyinstaller_windows:
   stage: build
   only:
     - master
@@ -63,7 +63,7 @@ pyinstaller_linux:
     - windows
     - python
   script:
-    - python builder.py build pyinstaller_linux
+    - python builder.py build pyinstaller_windows
   artifacts:
     paths:
       - build/gitlab_build_scripts/*

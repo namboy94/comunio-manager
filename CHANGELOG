@@ -1,4 +1,7 @@
-V 0.5.0
+V 0.5.1:
+  - Fixed build not generating a Windows executable
+  - Forgot to version bump
+V 0.5.0:
   - Now supporting Windows executables
   - Windowed mode by default windows, can be disabled by passing command line arguments
 V 0.4.3:
