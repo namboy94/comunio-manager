@@ -1,3 +1,6 @@
+V 0.5.0
+  - Now supporting Windows executables
+  - Windowed mode by default windows, can be disabled by passing command line arguments
 V 0.4.3:
   - Now uses python3 to build linux binaries
 V 0.4.2:
