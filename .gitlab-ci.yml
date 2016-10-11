@@ -132,26 +132,14 @@ generate_documentation_pdf:
     - cd doc
     - make buildsource
     - make latexpdf
+    - make html
+    - rsync -av build/html/ /var/www/docs.namibsun.net/public_html/html_docs/comunio-manager --delete-before
     - rsync -av build/latex/ComunioManager.pdf /var/www/docs.namibsun.net/public_html/pdf_docs/comunio-manager.pdf --delete-before
+    - cd ..
+    - python3 builder.py documentation-html /var/www/docs.namibsun.net/public_html
   artifacts:
     paths:
       - doc/build/latex/ComunioManager.pdf
-
-generate_documentation_html:
-  stage: docstats
-  only:
-    - master
-    - develop
-  tags:
-    - python
-    - linux
-  script:
-    - cd doc
-    - make buildsource
-    - make html
-    - rsync -av build/html/ /var/www/docs.namibsun.net/public_html/html_docs/comunio-manager --delete-before
-  artifacts:
-    paths:
       - doc/build/html
 
 gitstats:
@@ -164,20 +152,11 @@ gitstats:
   script:
     - gitstats . git_stats
     - rsync -av git_stats/ /var/www/gitstats.namibsun.net/public_html/gitstats/comunio-manager --delete-before
-  artifacts:
-    paths:
-      - git_stats
-
-git_stats:
-  stage: docstats
-  only:
-    - master
-    - develop
-  tags:
-    - linux
-  script:
+    - mv git_stats gitstats
     - git_stats generate
     - rsync -av git_stats/ /var/www/gitstats.namibsun.net/public_html/git_stats/comunio-manager --delete-before
+    - python3 builder.py gitstats-html /var/www/gitstats.namibsun.net/public_html
   artifacts:
     paths:
       - git_stats
+      - gitstats
