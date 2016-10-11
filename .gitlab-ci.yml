@@ -50,7 +50,9 @@ pyinstaller_linux:
     - linux
     - python
   script:
+    - python3 setup.py install --user
     - python3 builder.py build pyinstaller_linux
+    - pip3 uninstall comunio -y
   artifacts:
     paths:
       - build/gitlab_build_scripts/*
@@ -63,7 +65,9 @@ pyinstaller_windows:
     - windows
     - python
   script:
+    - python setup.py install
     - python builder.py build pyinstaller_windows
+    - pip uninstall comunio -y
   artifacts:
     paths:
       - build/gitlab_build_scripts/*
