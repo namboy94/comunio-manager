@@ -72,7 +72,6 @@ def skip(app, what, name, obj, skipper, options):
         return False
     return skipper
 
-
 def setup(app):
     # Register a sphinx.ext.autodoc.between listener to ignore everything
     # between lines that contain the word IGNORE
