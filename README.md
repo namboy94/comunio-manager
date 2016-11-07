@@ -66,12 +66,12 @@ graphs instead of normal graphs in the GUI
 
 Due to the design of Comunio, the program has a couple of limitations:
 
-  - When 5 players (the maximum amount) are up for sale, the database can not be updated,
+  - When the comunio community's maximum number of players are up for sale, the database can not be updated,
     as it is not possible to determine the market values of the players that are not on sale
   - At times, the comunio servers do not allow logins from non-'Pro' players. At those times,
-    the program can naturally not update the local database
+    the program can not update the local database
   - The program can not get data from the past. Gaps in the database are compensated, but
-    if no daily updates are done, gaps in the data will occur.
+    if no daily updates are done, gaps in the data will occur. A daily cron job is recommended
 
 ## Screenshots
 
@@ -85,14 +85,12 @@ Due to the design of Comunio, the program has a couple of limitations:
 
 ## Further Information
 
-[Documentation(HTML)](https://docs.namibsun.net/html_docs/comunio-manager/index.html)
-
-[Documentation(PDF)](https://docs.namibsun.net/pdf_docs/comunio-manager.pdf)
-
-[Python Package Index Site](https://pypi.python.org/pypi/comunio)
-
-[Git Statistics (gitstats)](https://gitstats.namibsun.net/gitstats/comunio-manager/index.html)
-
-[Git Statistics (git_stats)](https://gitstats.namibsun.net/git_stats/comunio-manager/index.html)
-
-[Changelog](https://gitlab.namibsun.net/namboy94/comunio-manager/raw/master/CHANGELOG)
+* [Changelog](https://gitlab.namibsun.net/namboy94/comunio-manager/raw/master/CHANGELOG)
+* [Gitlab](https://gitlab.namibsun.net/namboy94/comunio-manager)
+* [Github](https://github.com/namboy94/comunio-manager)
+* [Python Package Index Site](https://pypi.python.org/pypi/comunio)
+* [Documentation(HTML)](https://docs.namibsun.net/html_docs/comunio-manager/index.html)
+* [Documentation(PDF)](https://docs.namibsun.net/pdf_docs/comunio-manager.pdf)
+* [Git Statistics (gitstats)](https://gitstats.namibsun.net/gitstats/comunio-manager/index.html)
+* [Git Statistics (git_stats)](https://gitstats.namibsun.net/git_stats/comunio-manager/index.html)
+* [Test Coverage](https://coverage.namibsun.net/comunio-manager/index.html)
