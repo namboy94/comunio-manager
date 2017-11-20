@@ -2,7 +2,7 @@
 
 ![Logo](resources/logo/logo-readme.png)
 
-Comuni Manager is a desktop client for Comunio.
+Comunio Manager is a desktop client for Comunio.
 
 ## Further Information
 

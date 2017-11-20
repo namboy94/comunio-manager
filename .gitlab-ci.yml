@@ -8,7 +8,7 @@ github_mirror:
   script:
     - git checkout master
     - git pull
-    - git push git@github.com:namboy94/jxdcc.git master -f
+    - git push git@github.com:namboy94/comunio-manager.git master -f
     - git checkout develop
     - git pull
-    - git push git@github.com:namboy94/jxdcc.git develop -f
+    - git push git@github.com:namboy94/comunio-manager.git develop -f

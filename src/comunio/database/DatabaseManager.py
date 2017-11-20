@@ -27,7 +27,7 @@ LICENSE
 import os
 import sqlite3
 import datetime
-from typing import Dict, List, Tuple
+from typing import Dict, List
 from comunio.database.SqlQueries import SqlQueries
 from comunio.scraper.ComunioSession import ComunioSession
 

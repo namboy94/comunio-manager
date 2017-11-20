@@ -97,7 +97,7 @@ class ComunioFetcher(object):
 
         transfers = []
         for article in recent_news:
-            if article["type"] == "Transfers" and article["date"] == date:
+            if article["type"].startswith("Transfers") and article["date"] == date:
 
                 transfer_text = article["content"]
 
@@ -139,8 +139,8 @@ class ComunioFetcher(object):
         articles = []
 
         for index in range(0, len(article_headers)):
-            header = article_headers[index].text.strip()
-            content = article_content[index].text.strip()
+            header = article_headers[index].text.lstrip().rstrip()
+            content = article_content[index].text.lstrip().rstrip()
 
             article = {
                 "date": header.split(" ", 1)[0],
