@@ -1,3 +1,4 @@
+This project no longer maintains a changelog file.
 V 0.5.1:
   - Fixed build not generating a Windows executable
   - Forgot to version bump
