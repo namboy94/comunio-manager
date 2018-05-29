@@ -1,14 +1,12 @@
 stages:
-  - mirror
+  - stats
 
-github_mirror:
-  stage: mirror
+gitstats:
+  stage: stats
   tags:
-    - github_namboy94_push
+    - python3
+    - gitstats
+    - progstats
   script:
-    - git checkout master
-    - git pull
-    - git push git@github.com:namboy94/comunio-manager.git master -f
-    - git checkout develop
-    - git pull
-    - git push git@github.com:namboy94/comunio-manager.git develop -f
+    - python3 -m venv virtual && source virtual/bin/activate && pip install ci-scripts
+    - gitstats-gen
